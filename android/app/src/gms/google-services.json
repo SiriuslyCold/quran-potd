@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "286663652762",
+    "project_id": "quran-potd",
+    "storage_bucket": "quran-potd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:286663652762:android:82eaeef09ecb993d0c7623",
+        "android_client_info": {
+          "package_name": "com.mpv.quran_potd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyoDvtS8KEJjDEoh63qCzBItuxFKxckk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

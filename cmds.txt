@@ -1,0 +1,31 @@
+D:
+cd D:\Users\fkami\OneDrive\Documents\Projects\quran-potd
+
+$env:FUNCTIONS_DISCOVERY_TIMEOUT=120; 
+
+firebase deploy --only functions
+
+$env:FUNCTIONS_DISCOVERY_TIMEOUT=120; firebase deploy --only functions
+
+firebase deploy --only functions --debug
+
+or
+
+firebase deploy --only functions --debug > deploy_debug.txt 2>&1
+
+firebase functions:log
+firebase functions:log -n 50
+firebase functions:log --only serveDynamicMetaCard
+
+Save a Snapshot of Recent Logs
+firebase functions:log > backend-logs.txt
+
+firebase functions:log -n 200 > backend-logs.txt
+
+
+Stream and Save Live Logs in Real-Time
+firebase functions:log --open | Tee-Object -FilePath "backend-logs.txt"
+
+Filter for Your Specific Endpoint First
+firebase functions:log --only serveDynamicMetaCard -n 100 > meta_injector_logs.txt
+

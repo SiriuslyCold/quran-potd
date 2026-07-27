@@ -1,0 +1,13 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /passages/{passageId} {
+      allow read: if true; // Public read access for daily passages
+      allow write: if false; // Only written via service account / admin backend (Cloud Functions)
+    }
+    match /{document=**} {
+      allow read, write: if false; // Protect everything else
+    }
+  }
+}
