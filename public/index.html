@@ -123,6 +123,15 @@
                             <option value="ms">Bahasa Melayu (ms)</option>
                         </select>
                     </div>
+
+                    <!-- Translation Mode Selection -->
+                    <div class="settings-group">
+                        <label for="translation-type-select" id="settings-translation-type-label">Translation Mode</label>
+                        <select id="translation-type-select" style="background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 6px; padding: 0.5rem; width: 100%; outline: none; font-family: inherit; font-size: 0.85rem; cursor: pointer; margin-top: 0.3rem;">
+                            <option value="default" selected>Default</option>
+                            <option value="tasreef">Tasreef (Academic)</option>
+                        </select>
+                    </div>
     
                     <!-- Font Sliders -->
                     <div class="settings-group">
@@ -229,7 +238,7 @@
                 
                 <p><strong>Our Linguistic Philosophy</strong></p>
                 <p>To ensure absolute academic clarity, the AI relies entirely on internal structural morphology and the classical Minimal Uthmanic Rasm. It deliberately operates without importing external narrative layers, historical interpretations, secondary Hadith literature, or Seerah commentaries. The result is a pure, language-first analysis dedicated entirely to the intrinsic grammar, vocabulary, and structural framework of the text.</p>
-                <p>Powered by Gemini 3.1 and the QuranExplorer linguistic framework. Audio from the Quran API project (https://quranapi.pages.dev/)</p>
+                <p>Powered by Gemini 3.1 and the QuranExplorer linguistic framework. Default English translation courtesy of Safi Kaskas, Malay translation by Othman Ali. Audio from the Quran API project (https://quranapi.pages.dev/)</p>
                 
                 <p class="modal-footer-credit">Brought to you by Muslims for Progressive Values</p>
                 <p id="about-version-label" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.8rem; margin-bottom: 0;">Version 1.4.0</p>

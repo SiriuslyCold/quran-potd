@@ -1,3 +1,5 @@
 node_modules/
+archive
 *.local
+*.ps1
 service-account.json

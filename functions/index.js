@@ -17,6 +17,14 @@ function wordsMatch(wordA, wordB) {
   return cleanA === cleanB;
 }
 
+function readJSONFileSafe(filePath) {
+  let content = fs.readFileSync(filePath, "utf8");
+  if (content.charCodeAt(0) === 0xFEFF) {
+    content = content.slice(1);
+  }
+  return JSON.parse(content);
+}
+
 /**
  * Core generation logic for picking a random verse, generating translations, 
  * summary analysis, morphological analysis,Imagen background image, 
@@ -342,6 +350,43 @@ async function generatePassageForDate(todayStr, lang, bucket, selection = null) 
     console.error(`[FIRESTORE ERROR] Failed to write document:`, fsErr.message);
   }
 
+  // Generate default passage files if language is en or ms using the same metadata and overview
+  if (lang === "en" || lang === "ms") {
+    try {
+      console.log(`[DEFAULT GENERATION] Creating default passage file for ${lang}...`);
+      const defaultPayload = JSON.parse(JSON.stringify(parsedPayload)); // Deep clone
+      const defaultJsonPath = path.join(__dirname, `quran-${lang}.json`);
+      if (fs.existsSync(defaultJsonPath)) {
+        const defaultTranslations = readJSONFileSafe(defaultJsonPath);
+        defaultPayload.translations = defaultPayload.translations.map(t => {
+          const verseNum = Number(t.verse);
+          const match = defaultTranslations.find(
+            entry => entry.surah === surahId && entry.verse === verseNum
+          );
+          return {
+            ...t,
+            translation: match ? match.text : t.translation
+          };
+        });
+      }
+
+      const defaultCachePath = `archive/${lang}/passage_${todayStr}_default.json`;
+      const defaultCachedFile = bucket.file(defaultCachePath);
+      await defaultCachedFile.save(JSON.stringify(defaultPayload, null, 2), {
+        contentType: "application/json",
+        metadata: { cacheControl: "public, max-age=86400" }
+      });
+      console.log(`[DEFAULT GENERATION] Default GCS archive write committed successfully.`);
+
+      const db = admin.firestore();
+      const defaultDocId = `${lang}_${todayStr}_default`;
+      await db.collection("passages").doc(defaultDocId).set(defaultPayload);
+      console.log(`[DEFAULT GENERATION] Default Firestore document write committed successfully.`);
+    } catch (defaultErr) {
+      console.error(`[DEFAULT GENERATION ERROR] Failed to generate default passage:`, defaultErr.message);
+    }
+  }
+
   return parsedPayload;
 }
 
@@ -349,9 +394,10 @@ exports.getPassageOfTheDay = onRequest({ cors: true }, async (req, res) => {
   try {
     const bucket = admin.storage().bucket();
 
-    // Extract todayStr and lang parameters
+    // Extract todayStr, lang, and translationType parameters
     const todayStr = req.query.date || new Date().toISOString().split('T')[0];
     const lang = req.query.lang || "en";
+    const translationType = req.query.translationType || "tasreef"; // 'tasreef' or 'default'
 
     // ==========================================
     // STEP 0: CALCULATE & VERIFY NEIGHBOURING FLAGS FIRST
@@ -370,7 +416,10 @@ exports.getPassageOfTheDay = onRequest({ cors: true }, async (req, res) => {
 
     console.log(`[DEBUG 6] Timeline Navigation Audit for [${todayStr}] in lang [${lang}] -> hasPreviousDay: ${hasPreviousDay} | hasNextDay: ${hasNextDay}`);
 
-    const cachePath = `archive/${lang}/passage_${todayStr}.json`;
+    let cachePath = `archive/${lang}/passage_${todayStr}.json`;
+    if (translationType === "default" && (lang === "en" || lang === "ms")) {
+      cachePath = `archive/${lang}/passage_${todayStr}_default.json`;
+    }
     const cachedFile = bucket.file(cachePath);
 
     // ==========================================
@@ -388,7 +437,9 @@ exports.getPassageOfTheDay = onRequest({ cors: true }, async (req, res) => {
       // Lazy synchronize into Firestore if missing from Firestore collection
       try {
         const db = admin.firestore();
-        const docId = `${lang}_${todayStr}`;
+        const docId = (translationType === "default" && (lang === "en" || lang === "ms"))
+          ? `${lang}_${todayStr}_default`
+          : `${lang}_${todayStr}`;
         const docRef = db.collection("passages").doc(docId);
         const docSnap = await docRef.get();
         if (!docSnap.exists) {
@@ -399,26 +450,76 @@ exports.getPassageOfTheDay = onRequest({ cors: true }, async (req, res) => {
         console.error(`[FIRESTORE SYNC ERROR] Failed to lazy sync:`, syncErr.message);
       }
     } else {
-      console.log(`[DEBUG 1] CACHE MISS. Moving to fresh generation.`);
-      let selection = null;
-      if (lang !== "en") {
-        const enCachePath = `archive/en/passage_${todayStr}.json`;
-        const enFile = bucket.file(enCachePath);
-        const [enExists] = await enFile.exists();
-        if (enExists) {
-          console.log(`[DEBUG 1] English passage exists for date. Reusing selection to generate ${lang}...`);
-          const [enContent] = await enFile.download();
-          const enPassage = JSON.parse(enContent.toString());
-          selection = {
-            surahId: enPassage.meta.surahId,
-            surahName: enPassage.meta.surahName,
-            targetVerse: enPassage.meta.targetVerse,
-            startVerse: Number(enPassage.meta.range.split("-")[0]),
-            endVerse: Number(enPassage.meta.range.split("-")[1])
-          };
+      // Check if we are requesting default and we can generate it from the tasreef file
+      let defaultGeneratedFromTasreef = false;
+      if (translationType === "default" && (lang === "en" || lang === "ms")) {
+        const tasreefCachePath = `archive/${lang}/passage_${todayStr}.json`;
+        const tasreefFile = bucket.file(tasreefCachePath);
+        const [tasreefExists] = await tasreefFile.exists();
+        if (tasreefExists) {
+          console.log(`[DEBUG 1] Tasreef passage exists, but default does not. Generating default from tasreef passage...`);
+          const [tasreefContent] = await tasreefFile.download();
+          const tasreefPayload = JSON.parse(tasreefContent.toString());
+          
+          // Construct default payload
+          const defaultPayload = JSON.parse(JSON.stringify(tasreefPayload));
+          const quranDefault = readJSONFileSafe(path.join(__dirname, `quran-${lang}.json`));
+          
+          defaultPayload.translations = defaultPayload.translations.map(t => {
+            const verseNum = Number(t.verse);
+            const defaultEntry = quranDefault.find(
+              (entry) => entry.surah === defaultPayload.meta.surahId && entry.verse === verseNum
+            );
+            return {
+              ...t,
+              translation: defaultEntry ? defaultEntry.text : t.translation
+            };
+          });
+
+          // Save default to storage
+          await cachedFile.save(JSON.stringify(defaultPayload, null, 2), {
+            contentType: "application/json",
+            metadata: { cacheControl: "public, max-age=86400" }
+          });
+
+          // Save to Firestore
+          const db = admin.firestore();
+          const docId = `${lang}_${todayStr}_default`;
+          await db.collection("passages").doc(docId).set(defaultPayload);
+
+          parsedPayload = defaultPayload;
+          defaultGeneratedFromTasreef = true;
         }
       }
-      parsedPayload = await generatePassageForDate(todayStr, lang, bucket, selection);
+
+      if (!defaultGeneratedFromTasreef) {
+        console.log(`[DEBUG 1] CACHE MISS. Moving to fresh generation.`);
+        let selection = null;
+        if (lang !== "en") {
+          const enCachePath = `archive/en/passage_${todayStr}.json`;
+          const enFile = bucket.file(enCachePath);
+          const [enExists] = await enFile.exists();
+          if (enExists) {
+            console.log(`[DEBUG 1] English passage exists for date. Reusing selection to generate ${lang}...`);
+            const [enContent] = await enFile.download();
+            const enPassage = JSON.parse(enContent.toString());
+            selection = {
+              surahId: enPassage.meta.surahId,
+              surahName: enPassage.meta.surahName,
+              targetVerse: enPassage.meta.targetVerse,
+              startVerse: Number(enPassage.meta.range.split("-")[0]),
+              endVerse: Number(enPassage.meta.range.split("-")[1])
+            };
+          }
+        }
+        parsedPayload = await generatePassageForDate(todayStr, lang, bucket, selection);
+        if (translationType === "default" && (lang === "en" || lang === "ms")) {
+          // Load the default version we just wrote in generatePassageForDate
+          const defaultCachePath = `archive/${lang}/passage_${todayStr}_default.json`;
+          const [defaultContent] = await bucket.file(defaultCachePath).download();
+          parsedPayload = JSON.parse(defaultContent.toString());
+        }
+      }
     }
 
     // Inject dynamic navigation flags (not persisted in JSON storage file)

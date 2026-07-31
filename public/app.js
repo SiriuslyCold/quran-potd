@@ -17,6 +17,14 @@ let currentDateInstance = new Date();
 const REAL_TODAY_STR = new Date().toISOString().split('T')[0];
 let activePassageData = null;
 let currentLanguage = localStorage.getItem("appLanguage") || "en";
+let currentTranslationType = "default";
+try {
+    if (localStorage.getItem("appTranslationExplicitTasreef") === "true") {
+        currentTranslationType = "tasreef";
+    }
+} catch (e) {
+    console.error(e);
+}
 
 
 
@@ -42,6 +50,9 @@ const locales = {
         "themeDark": "Dark",
         "themeSystem": "System",
         "settingsLanguage": "App Language",
+        "settingsTranslationMode": "Translation Mode",
+        "translationModeTasreef": "Tasreef (Academic)",
+        "translationModeDefault": "Default",
         "settingsArabicSize": "Arabic Text Size",
         "settingsTranslationSize": "Translation Text Size",
         "settingsNotifications": "Daily Notifications",
@@ -103,6 +114,9 @@ const locales = {
         "themeDark": "Gelap",
         "themeSystem": "Sistem",
         "settingsLanguage": "Bahasa Aplikasi",
+        "settingsTranslationMode": "Mod Terjemahan",
+        "translationModeTasreef": "Tasreef (Akademik)",
+        "translationModeDefault": "Biasa (Default)",
         "settingsArabicSize": "Saiz Teks Arab",
         "settingsTranslationSize": "Saiz Teks Terjemahan",
         "settingsNotifications": "Notifikasi Harian",
@@ -336,6 +350,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const arabicFontSlider = document.getElementById("arabic-font-slider");
     const englishFontSlider = document.getElementById("english-font-slider");
     const langSelect = document.getElementById("lang-select");
+    const translationTypeSelect = document.getElementById("translation-type-select");
 
     // Theme selector buttons inside panel
     const themeBtnLight = document.getElementById("theme-btn-light");
@@ -464,6 +479,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
     }
 
+    // Initialize App Translation Mode dropdown
+    if (translationTypeSelect) {
+        translationTypeSelect.value = currentTranslationType;
+        translationTypeSelect.onchange = (e) => {
+            const newType = e.target.value;
+            currentTranslationType = newType;
+            localStorage.setItem("appTranslationType", newType);
+            localStorage.setItem("appTranslationExplicitTasreef", newType === "tasreef" ? "true" : "false");
+            logAnalyticsEvent("translation_type_changed", { type: newType });
+            console.log(`[DEBUG CLIENT] Translation mode changed to: ${newType}`);
+
+            // Reload passage
+            loadPassageForDate(currentDateInstance);
+        };
+    }
+
     // Initialize Daily Notifications toggle state
     let notificationsEnabled = true;
     try {
@@ -575,7 +606,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         loader.classList.remove("hidden");
         appContent.classList.add("hidden");
 
-        const requestUrl = `${FUNCTION_URL}?date=${dateStr}&lang=${currentLanguage}`;
+        const requestUrl = `${FUNCTION_URL}?date=${dateStr}&lang=${currentLanguage}&translationType=${currentTranslationType}`;
 
         try {
             // 1. Primary path: query HTTP endpoint to guarantee Storage existence verification
@@ -591,7 +622,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log("[DEBUG CLIENT] Passage payload received via HTTP:", data);
 
             // Cache successful payload in localStorage as extra fallback layer
-            localStorage.setItem(`passage_${currentLanguage}_${dateStr}`, JSON.stringify(data));
+            localStorage.setItem(`passage_${currentLanguage}_${currentTranslationType}_${dateStr}`, JSON.stringify(data));
             localStorage.setItem("last_loaded_date", dateStr);
             activePassageData = data;
 
@@ -599,7 +630,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (db) {
                 try {
                     const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-                    const docId = `${currentLanguage}_${dateStr}`;
+                    const docId = (currentTranslationType === "default" && (currentLanguage === "en" || currentLanguage === "ms"))
+                        ? `${currentLanguage}_${dateStr}_default`
+                        : `${currentLanguage}_${dateStr}`;
                     const docRef = doc(db, "passages", docId);
                     getDoc(docRef).then(() => {
                         console.log("[DEBUG CLIENT] Cached passage in Firestore IndexedDB via background read.");
@@ -621,7 +654,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (db) {
                 try {
                     const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-                    const docId = `${currentLanguage}_${dateStr}`;
+                    const docId = (currentTranslationType === "default" && (currentLanguage === "en" || currentLanguage === "ms"))
+                        ? `${currentLanguage}_${dateStr}_default`
+                        : `${currentLanguage}_${dateStr}`;
                     const docRef = doc(db, "passages", docId);
                     const docSnap = await getDoc(docRef);
 
@@ -642,7 +677,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             // 3. Tertiary path: Fallback to local storage cache
-            const cachedData = localStorage.getItem(`passage_${currentLanguage}_${dateStr}`);
+            const cachedData = localStorage.getItem(`passage_${currentLanguage}_${currentTranslationType}_${dateStr}`);
             if (cachedData) {
                 const parsed = JSON.parse(cachedData);
                 activePassageData = parsed;
@@ -917,6 +952,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const settingsLangLabel = document.getElementById("settings-lang-label");
         if (settingsLangLabel) settingsLangLabel.innerText = strings.settingsLanguage;
+
+        const settingsTranslationModeLabel = document.getElementById("settings-translation-type-label");
+        if (settingsTranslationModeLabel) settingsTranslationModeLabel.innerText = strings.settingsTranslationMode;
+
+        const translationTypeSelect = document.getElementById("translation-type-select");
+        if (translationTypeSelect) {
+            translationTypeSelect.options[0].text = strings.translationModeDefault;
+            translationTypeSelect.options[1].text = strings.translationModeTasreef;
+        }
 
         const settingsArabicSizeLabel = document.getElementById("settings-arabic-size-label");
         if (settingsArabicSizeLabel) settingsArabicSizeLabel.innerText = strings.settingsArabicSize;
@@ -1428,7 +1472,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Silent fetch for tomorrow's passage title
             let passageTitle = "Reflect on today's verses and linguistic breakdown.";
             try {
-                const res = await fetch(`https://getpassageoftheday-mayya3vt7q-uc.a.run.app?date=${tomorrowStr}`);
+                const res = await fetch(`https://getpassageoftheday-mayya3vt7q-uc.a.run.app?date=${tomorrowStr}&lang=${currentLanguage}&translationType=${currentTranslationType}`);
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.title) {
