@@ -1,5 +1,10 @@
 {
   "appId": "com.mpv.quran_potd",
   "appName": "Qur'an Passage of the Day",
-  "webDir": "public"
+  "webDir": "public",
+  "plugins": {
+    "StatusBar": {
+      "overlaysWebView": false
+    }
+  }
 }

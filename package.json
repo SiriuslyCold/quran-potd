@@ -1,6 +1,6 @@
 {
   "name": "quran-potd",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Quran Passage of the Day Android and iOS mobile app wrappers around responsive web frontend.",
   "main": "public/app.js",
   "scripts": {

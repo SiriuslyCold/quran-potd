@@ -266,6 +266,7 @@ function applyTheme(theme) {
         const { StatusBar } = window.Capacitor.Plugins;
         try {
             const colorHex = resolvedTheme === 'dark' ? '#020617' : '#f8fafc';
+            StatusBar.setOverlaysWebView({ overlay: false }).catch(err => console.log(err));
             StatusBar.setBackgroundColor({ color: colorHex }).catch(err => console.log(err));
             StatusBar.setStyle({ style: resolvedTheme === 'dark' ? 'DARK' : 'LIGHT' }).catch(err => console.log(err));
         } catch (err) {
@@ -1842,8 +1843,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (Purchases) {
                     try {
                         const apiKey = window.Capacitor.getPlatform() === 'ios'
-                            ? "appl_api_key_placeholder"
-                            : "goog_api_key_placeholder";
+                            ? "appl_puVnUAMslLndYXRpNNqygcmWyzd"
+                            : "goog_fucCDqVdLJYzzgZIuccubFtEgvv";
 
                         await Purchases.configure({ apiKey: apiKey });
                         console.log("[DEBUG CLIENT] RevenueCat configured.");
