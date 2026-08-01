@@ -74,6 +74,7 @@ node_modules/
 !update.ps1
 !build_android.ps1
 !build_huawei.ps1
+!build_ios.ps1
 !build.ps1
 
 # Ignore a specific folder and all its contents
