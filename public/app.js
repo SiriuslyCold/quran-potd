@@ -1714,9 +1714,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const { Purchases } = window.Capacitor.Plugins;
                 if (Purchases) {
                     const offerings = await Purchases.getOfferings();
-                    if (offerings.current && offerings.current[packageType]) {
+                    const rcPackageKey = (packageType === 'yearly' || packageType === 'trial') ? 'annual' : packageType;
+                    if (offerings.current && offerings.current[rcPackageKey]) {
                         const purchaseResult = await Purchases.purchasePackage({
-                            aPackage: offerings.current[packageType]
+                            aPackage: offerings.current[rcPackageKey]
                         });
                         if (purchaseResult.customerInfo.entitlements.active['premium_access']) {
                             unlockPremiumAccess("Subscription Active! Premium access unlocked.");

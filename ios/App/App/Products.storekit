@@ -1,0 +1,75 @@
+{
+  "identifier" : "PremiumArchiveSubscriptions",
+  "nonRenewingSubscriptions" : [ ],
+  "products" : [ ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "error" : 0,
+        "label" : "Unchanged"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "premium_access",
+      "localizations" : [ ],
+      "name" : "Premium Access",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [ ],
+          "codeOffers" : [ ],
+          "displayPrice" : "1.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "premium_archive_monthly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Unlock premium archive access monthly",
+              "displayName" : "Premium Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "premium_archive_monthly",
+          "referenceName" : "Premium Archive Monthly",
+          "subscriptionPeriod" : "P1M",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [ ],
+          "codeOffers" : [ ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "premium_archive_yearly",
+          "introductoryOffer" : {
+            "internalID" : "premium_archive_yearly_trial",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "referenceName" : "7-Day Free Trial",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "Unlock premium archive access yearly with a 7-day free trial",
+              "displayName" : "Premium Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "premium_archive_yearly",
+          "referenceName" : "Premium Archive Yearly",
+          "subscriptionPeriod" : "P1Y",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}
