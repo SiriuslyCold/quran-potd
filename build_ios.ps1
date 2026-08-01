@@ -4,6 +4,7 @@ Set-Location $projectDir
 
 # Auto-increment CURRENT_PROJECT_VERSION in project.pbxproj
 $pbxprojPath = "$projectDir\ios\App\App.xcodeproj\project.pbxproj"
+$newVersionCode = $null
 if (Test-Path $pbxprojPath) {
     $content = Get-Content -Path $pbxprojPath -Raw
     if ($content -match 'CURRENT_PROJECT_VERSION\s*=\s*(\d+);') {
@@ -19,7 +20,7 @@ if (Test-Path $pbxprojPath) {
     Write-Warning "Could not find project.pbxproj at $pbxprojPath"
 }
 
-Write-Host "`nSyncing Capacitor assets to iOS..." -ForegroundColor Cyan
+Write-Host "`n[1/3] Syncing Capacitor assets to iOS..." -ForegroundColor Cyan
 npx cap sync ios
 
 if ($LASTEXITCODE -ne 0) {
@@ -27,8 +28,21 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-Write-Host "`n==========================================" -ForegroundColor Green
-Write-Host "iOS Sync & Version Increment Succeeded!" -ForegroundColor Green
-Write-Host "==========================================" -ForegroundColor Green
-Write-Host "The project is updated to build number: $newVersionCode" -ForegroundColor Yellow
-Write-Host "You can now push these changes to GitHub to trigger your iOS remote build pipeline."
+# Automatically commit and push version bump to trigger Appflow
+if ($newVersionCode) {
+    Write-Host "`n[2/3] Staging and committing version bump to Git..." -ForegroundColor Cyan
+    git add ios/App/App.xcodeproj/project.pbxproj
+    git commit -m "chore(ios): bump build number to $newVersionCode"
+    
+    Write-Host "`n[3/3] Pushing to GitHub (triggers Ionic Appflow)..." -ForegroundColor Cyan
+    git push origin main
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "`n==========================================" -ForegroundColor Green
+        Write-Host "iOS Version Bump pushed to GitHub!" -ForegroundColor Green
+        Write-Host "Ionic Appflow build #$newVersionCode is triggering now." -ForegroundColor Green
+        Write-Host "==========================================" -ForegroundColor Green
+    } else {
+        Write-Warning "Failed to push to GitHub. Please push changes manually."
+    }
+}
