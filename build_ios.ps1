@@ -1,3 +1,7 @@
+param (
+    [switch]$NoPush
+)
+
 # Set project directory
 $projectDir = "D:\Users\fkami\OneDrive\Documents\Projects\quran-potd"
 Set-Location $projectDir
@@ -28,21 +32,28 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Automatically commit and push version bump to trigger Appflow
+# Automatically commit and push version bump
 if ($newVersionCode) {
     Write-Host "`n[2/3] Staging and committing version bump to Git..." -ForegroundColor Cyan
     git add ios/App/App.xcodeproj/project.pbxproj
     git commit -m "chore(ios): bump build number to $newVersionCode"
     
-    Write-Host "`n[3/3] Pushing to GitHub (triggers Ionic Appflow)..." -ForegroundColor Cyan
-    git push origin main
-    
-    if ($LASTEXITCODE -eq 0) {
+    if ($NoPush) {
         Write-Host "`n==========================================" -ForegroundColor Green
-        Write-Host "iOS Version Bump pushed to GitHub!" -ForegroundColor Green
-        Write-Host "Ionic Appflow build #$newVersionCode is triggering now." -ForegroundColor Green
+        Write-Host "iOS Version Bump committed locally!" -ForegroundColor Green
+        Write-Host "Build number updated to #$newVersionCode. Pushing was skipped (-NoPush)." -ForegroundColor Yellow
         Write-Host "==========================================" -ForegroundColor Green
     } else {
-        Write-Warning "Failed to push to GitHub. Please push changes manually."
+        Write-Host "`n[3/3] Pushing to GitHub (triggers Ionic Appflow)..." -ForegroundColor Cyan
+        git push origin main
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "`n==========================================" -ForegroundColor Green
+            Write-Host "iOS Version Bump pushed to GitHub!" -ForegroundColor Green
+            Write-Host "Ionic Appflow build #$newVersionCode is triggering now." -ForegroundColor Green
+            Write-Host "==========================================" -ForegroundColor Green
+        } else {
+            Write-Warning "Failed to push to GitHub. Please push changes manually."
+        }
     }
 }
