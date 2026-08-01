@@ -9,21 +9,39 @@ if (-not $env:JAVA_HOME) {
 
 Write-Host "Using JAVA_HOME: $env:JAVA_HOME" -ForegroundColor Green
 
-# Auto-increment versionCode in build.gradle
+# Auto-increment Android versionCode and sync iOS CURRENT_PROJECT_VERSION
 $gradlePath = "$projectDir\android\app\build.gradle"
+$newVersionCode = $null
 if (Test-Path $gradlePath) {
     $content = Get-Content -Path $gradlePath -Raw
     if ($content -match 'versionCode\s+(\d+)') {
-        $oldVersionCode = $Matches[1]
-        $newVersionCode = [int]$oldVersionCode + 1
-        $content = $content -replace "versionCode\s+$oldVersionCode", "versionCode $newVersionCode"
+        $oldAndroidVersion = $Matches[1]
+        $newVersionCode = [int]$oldAndroidVersion + 1
+        $content = $content -replace "versionCode\s+$oldAndroidVersion", "versionCode $newVersionCode"
         [System.IO.File]::WriteAllText($gradlePath, $content)
-        Write-Host "Auto-incremented build number (versionCode) from $oldVersionCode to $newVersionCode" -ForegroundColor Green
+        Write-Host "Auto-incremented Android build number (versionCode) to $newVersionCode" -ForegroundColor Green
     } else {
         Write-Warning "Could not parse 'versionCode' in $gradlePath"
     }
 } else {
     Write-Warning "Could not find build.gradle at $gradlePath"
+}
+
+if ($newVersionCode) {
+    $pbxprojPath = "$projectDir\ios\App\App.xcodeproj\project.pbxproj"
+    if (Test-Path $pbxprojPath) {
+        $content = Get-Content -Path $pbxprojPath -Raw
+        if ($content -match 'CURRENT_PROJECT_VERSION\s*=\s*(\d+);') {
+            $oldIosVersion = $Matches[1]
+            $content = $content -replace "CURRENT_PROJECT_VERSION\s*=\s*$oldIosVersion;", "CURRENT_PROJECT_VERSION = $newVersionCode;"
+            [System.IO.File]::WriteAllText($pbxprojPath, $content)
+            Write-Host "Synchronized iOS build number (CURRENT_PROJECT_VERSION) from $oldIosVersion to $newVersionCode" -ForegroundColor Green
+        } else {
+            Write-Warning "Could not parse CURRENT_PROJECT_VERSION in $pbxprojPath"
+        }
+    } else {
+        Write-Warning "Could not find project.pbxproj at $pbxprojPath"
+    }
 }
 
 Write-Host "`n[1/3] Syncing Capacitor assets to Android..." -ForegroundColor Cyan
