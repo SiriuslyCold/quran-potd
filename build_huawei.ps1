@@ -63,10 +63,24 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+if ($null -eq $newVersionCode) {
+    $gradleContent = Get-Content -Path "$projectDir\android\app\build.gradle" -Raw
+    if ($gradleContent -match 'versionCode\s+(\d+)') {
+        $newVersionCode = $Matches[1]
+    }
+}
+
+$sourceAab = "$projectDir\android\app\build\outputs\bundle\hmsRelease\app-hms-release.aab"
+$targetAab = "$projectDir\android\app\build\outputs\bundle\hmsRelease\app-hms-release-v$newVersionCode.aab"
+if (Test-Path $sourceAab) {
+    Copy-Item -Path $sourceAab -Destination $targetAab -Force
+}
+
 Write-Host "`n==========================================" -ForegroundColor Green
 Write-Host "Build Succeeded!" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Green
 Write-Host "Generated AAB (App Bundle) file is located at:" -ForegroundColor Yellow
-Write-Host " - HMS Release: android\app\build\outputs\bundle\hmsRelease\app-hms-release.aab"
+Write-Host " - HMS Release: android\app\build\outputs\bundle\hmsRelease\app-hms-release-v$newVersionCode.aab"
+Write-Host " - (Original):  android\app\build\outputs\bundle\hmsRelease\app-hms-release.aab"
 Write-Host "`nNote: If you need to build local APKs instead of AABs, you can run:" -ForegroundColor Cyan
 Write-Host "  .\gradlew.bat assembleHmsRelease"
