@@ -1681,6 +1681,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ==========================================
     // 💳 IN-APP SUBSCRIPTIONS (REVENUECAT)
     // ==========================================
+    // Helper to evaluate active entitlements or active direct subscriptions from RevenueCat CustomerInfo
+    function hasActiveEntitlement(customerInfo) {
+        if (!customerInfo) return null;
+        
+        console.log("[DEBUG CLIENT] Checking active entitlements. Raw activeSubscriptions:", 
+            JSON.stringify(customerInfo.activeSubscriptions), 
+            "Active Entitlements:", 
+            JSON.stringify(customerInfo.entitlements ? customerInfo.entitlements.active : null)
+        );
+
+        // 1. Check preferred entitlement
+        if (customerInfo.entitlements && customerInfo.entitlements.active && customerInfo.entitlements.active['premium_access']) {
+            return customerInfo.entitlements.active['premium_access'];
+        }
+
+        // 2. Check any active entitlement
+        if (customerInfo.entitlements && customerInfo.entitlements.active) {
+            const activeKeys = Object.keys(customerInfo.entitlements.active);
+            if (activeKeys.length > 0) {
+                console.log(`[DEBUG CLIENT] Fallback: Using active entitlement '${activeKeys[0]}'`);
+                return customerInfo.entitlements.active[activeKeys[0]];
+            }
+        }
+
+        // 3. Check any active subscriptions directly (failsafe if entitlement not configured in dashboard)
+        if (customerInfo.activeSubscriptions && customerInfo.activeSubscriptions.length > 0) {
+            const activeSubProdId = customerInfo.activeSubscriptions[0];
+            console.log(`[DEBUG CLIENT] Fallback: Found direct active subscription product in RevenueCat: '${activeSubProdId}'`);
+            return {
+                productIdentifier: activeSubProdId,
+                isActive: true
+            };
+        }
+
+        return null;
+    }
+
     // Helper to commit premium access and update views
     function unlockPremiumAccess(message) {
         isSubscribed = true;
@@ -1761,7 +1798,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const purchaseResult = await Purchases.purchasePackage({
                             aPackage: offerings.current[rcPackageKey]
                         });
-                        if (purchaseResult.customerInfo.entitlements.active['premium_access']) {
+                        if (hasActiveEntitlement(purchaseResult.customerInfo)) {
                             unlockPremiumAccess("Subscription Active! Premium access unlocked.");
                             return;
                         }
@@ -1770,7 +1807,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const purchaseResult = await Purchases.purchaseProduct({
                             productId: fallbackProductId
                         });
-                        if (purchaseResult.customerInfo.entitlements.active['premium_access']) {
+                        if (hasActiveEntitlement(purchaseResult.customerInfo)) {
                             unlockPremiumAccess("Subscription Active! Premium access unlocked.");
                             return;
                         }
@@ -1834,7 +1871,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const { Purchases } = window.Capacitor.Plugins;
                     if (Purchases) {
                         const customerInfo = await Purchases.restorePurchases();
-                        if (customerInfo.entitlements.active['premium_access']) {
+                        if (hasActiveEntitlement(customerInfo)) {
                             unlockPremiumAccess("Purchases restored successfully!");
                         } else {
                             showToast("No active premium subscription found to restore.");
@@ -1922,10 +1959,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         console.log("[DEBUG CLIENT] RevenueCat configured.");
 
                         const customerInfo = await Purchases.getCustomerInfo();
-                        const premiumEntitlement = customerInfo.entitlements.active['premium_access'];
-                        if (premiumEntitlement) {
+                        const activeEnt = hasActiveEntitlement(customerInfo);
+                        if (activeEnt) {
                             subscriptionActive = true;
-                            const prodId = premiumEntitlement.productIdentifier || "";
+                            const prodId = activeEnt.productIdentifier || "";
                             if (prodId.includes("yearly") || prodId.includes("annual")) {
                                 planType = "yearly";
                             } else if (prodId.includes("monthly")) {
