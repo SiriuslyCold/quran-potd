@@ -52,6 +52,12 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+Write-Host "Resolving symbolic links for Windows Gradle compatibility..." -ForegroundColor Yellow
+Remove-Item -Path "$projectDir\android\app\src\main\assets\public\cordova.js" -Force -ErrorAction SilentlyContinue
+Copy-Item -Path "$projectDir\node_modules\@capacitor\core\cordova.js" -Destination "$projectDir\android\app\src\main\assets\public\cordova.js"
+Remove-Item -Path "$projectDir\android\app\src\main\assets\public\cordova_plugins.js" -Force -ErrorAction SilentlyContinue
+New-Item -Path "$projectDir\android\app\src\main\assets\public\cordova_plugins.js" -ItemType File -Value "" -Force
+
 Write-Host "`n[2/3] Navigating to Android project..." -ForegroundColor Cyan
 Set-Location "$projectDir\android"
 
