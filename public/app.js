@@ -1689,11 +1689,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                             return;
                         }
                     }
+                    showToast(`Huawei Purchase result code: ${purchaseResult.returnCode}`);
+                } else {
+                    showToast(`Huawei HMS environment not ready (Code ${envReadyResult.returnCode})`);
                 }
-                showToast("Huawei In-App Purchase failed or was cancelled.");
             } catch (err) {
                 console.error("[HMS IAP] Error during Huawei IAP purchase:", err);
-                showToast("Huawei AppGallery Billing is currently unavailable.");
+                const detail = err ? (err.message || JSON.stringify(err)) : "Unknown error";
+                showToast(`Huawei Billing error: ${detail}`);
             }
         } else {
             console.warn("[HMS IAP] Huawei IAP plugin not detected. Simulating HMS purchase...");
@@ -1736,7 +1739,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             } catch (err) {
                 console.error("[DEBUG CLIENT] RevenueCat purchase failed:", err);
-                showToast("Purchase cancelled or failed.");
+                if (err && err.userCancelled) {
+                    showToast("Purchase cancelled.");
+                } else {
+                    const errMsg = err ? (err.message || err.readableErrorCode || JSON.stringify(err)) : "Unknown error";
+                    showToast(`Purchase failed: ${errMsg}`);
+                }
             }
         } else {
             // Browser testing simulation triggers simulated purchase and sets subscriber flag true
@@ -1750,21 +1758,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (paywallSubscribeMonthlyBtn) {
         paywallSubscribeMonthlyBtn.onclick = () => {
             logAnalyticsEvent('subscribe_monthly_click');
-            purchaseSubscription('monthly', 'premium_archive_monthly');
+            const fallbackId = isCapacitor && window.Capacitor.getPlatform() === 'ios'
+                ? 'premium_archive_monthly'
+                : 'premium_archive_monthly:monthly-base-plan';
+            purchaseSubscription('monthly', fallbackId);
         };
     }
 
     if (paywallSubscribeYearlyBtn) {
         paywallSubscribeYearlyBtn.onclick = () => {
             logAnalyticsEvent('subscribe_yearly_click');
-            purchaseSubscription('yearly', 'premium_archive_yearly');
+            const fallbackId = isCapacitor && window.Capacitor.getPlatform() === 'ios'
+                ? 'premium_archive_yearly'
+                : 'premium_archive_yearly:yearly-base-plan';
+            purchaseSubscription('yearly', fallbackId);
         };
     }
 
     if (paywallTrialBtn) {
         paywallTrialBtn.onclick = () => {
             logAnalyticsEvent('subscribe_trial_click');
-            purchaseSubscription('trial', 'premium_archive_yearly');
+            const fallbackId = isCapacitor && window.Capacitor.getPlatform() === 'ios'
+                ? 'premium_archive_yearly'
+                : 'premium_archive_yearly:yearly-base-plan';
+            purchaseSubscription('trial', fallbackId);
         };
     }
 
@@ -1785,7 +1802,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 } catch (err) {
                     console.error("[DEBUG CLIENT] RevenueCat restore failed:", err);
-                    showToast("Restore failed.");
+                    const errMsg = err ? (err.message || err.readableErrorCode || JSON.stringify(err)) : "Unknown error";
+                    showToast(`Restore failed: ${errMsg}`);
                 }
             } else {
                 showToast("Web Simulation: No purchases to restore.");
