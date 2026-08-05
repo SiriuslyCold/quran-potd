@@ -209,7 +209,7 @@ h1 {
 }
 
 .nav-arrow-btn:hover {
-    color: #ffffff;
+    color: var(--text-main);
     transform: scale(1.25);
 }
 
