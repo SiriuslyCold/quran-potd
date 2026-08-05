@@ -944,6 +944,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         imageTags.forEach(tag => tag.setAttribute("content", imageUrl));
     }
 
+    async function showDeveloperDiagnostics() {
+        let diagInfo = `--- Diagnostics ---\n`;
+        diagInfo += `Flavor: ${window.buildFlavor}\n`;
+        diagInfo += `IsSubscribed: ${isSubscribed}\n`;
+        diagInfo += `ActivePlanType: ${activePlanType}\n`;
+        diagInfo += `IsCapacitor: ${isCapacitor}\n`;
+        if (isCapacitor) {
+            diagInfo += `Platform: ${window.Capacitor.getPlatform()}\n`;
+            try {
+                const { Purchases } = window.Capacitor.Plugins;
+                if (Purchases) {
+                    const uidResult = await Purchases.getAppUserID();
+                    const uid = (uidResult && typeof uidResult === 'object') ? (uidResult.appUserID || JSON.stringify(uidResult)) : uidResult;
+                    diagInfo += `RC AppUserID: ${uid}\n`;
+                    
+                    const infoResult = await Purchases.getCustomerInfo();
+                    const info = (infoResult && infoResult.customerInfo) ? infoResult.customerInfo : infoResult;
+                    diagInfo += `RC Active Subs: ${JSON.stringify(info ? info.activeSubscriptions : null)}\n`;
+                    diagInfo += `RC All Purchased: ${JSON.stringify(info ? info.allPurchasedProductIdentifiers : null)}\n`;
+                    diagInfo += `RC Entitlements: ${JSON.stringify((info && info.entitlements && info.entitlements.active) ? Object.keys(info.entitlements.active) : null)}\n`;
+                }
+            } catch (err) {
+                diagInfo += `RC Error: ${err.message || JSON.stringify(err)}\n`;
+            }
+        }
+        alert(diagInfo);
+    }
+
     function applyLocalization(lang) {
         const strings = locales[lang] || locales["en"];
 
@@ -1107,6 +1135,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         const aboutVersionLabel = document.getElementById("about-version-label");
         if (aboutVersionLabel) {
             aboutVersionLabel.innerText = `${lang === "ms" ? "Versi" : "Version"} ${APP_VERSION}`;
+            
+            // Hidden developer diagnostics tool (tap 5 times)
+            let versionClickCount = 0;
+            aboutVersionLabel.onclick = () => {
+                versionClickCount++;
+                if (versionClickCount >= 5) {
+                    versionClickCount = 0;
+                    showDeveloperDiagnostics();
+                }
+            };
         }
 
         // About Modal subscription status
@@ -1682,14 +1720,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 💳 IN-APP SUBSCRIPTIONS (REVENUECAT)
     // ==========================================
     // Helper to evaluate active entitlements or active direct subscriptions from RevenueCat CustomerInfo
-    function hasActiveEntitlement(customerInfo) {
-        if (!customerInfo) return null;
+    function hasActiveEntitlement(infoOrResult) {
+        if (!infoOrResult) return null;
+        
+        let customerInfo = infoOrResult;
+        if (infoOrResult && infoOrResult.customerInfo) {
+            customerInfo = infoOrResult.customerInfo;
+        }
         
         console.log("[DEBUG CLIENT] Checking active entitlements. Raw activeSubscriptions:", 
-            JSON.stringify(customerInfo.activeSubscriptions), 
+            JSON.stringify(customerInfo ? customerInfo.activeSubscriptions : null), 
             "Active Entitlements:", 
-            JSON.stringify(customerInfo.entitlements ? customerInfo.entitlements.active : null)
+            JSON.stringify((customerInfo && customerInfo.entitlements) ? customerInfo.entitlements.active : null)
         );
+
+        if (!customerInfo) return null;
 
         // 1. Check preferred entitlement
         if (customerInfo.entitlements && customerInfo.entitlements.active && customerInfo.entitlements.active['premium_access']) {
