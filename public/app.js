@@ -31,6 +31,7 @@ try {
 // Theme Settings state
 let currentThemeSetting = 'system'; // 'light' | 'dark' | 'system'
 let isSubscribed = false; // Subscription entitlement status flag
+let activePlanType = null; // Plan type: 'monthly', 'yearly', or null
 let activeAudio = null; // Active HTML5 Audio playback reference instance
 let activeAudioButton = null; // Currently playing verse button DOM reference
 
@@ -101,7 +102,12 @@ const locales = {
         "shareDeviceLabel": "Share via Device...",
         "shareTextHeader": "📖 Qur'an Passage of the Day",
         "shareTextVerses": "Verses",
-        "shareTextLink": "🔗 View keyword linguistic breakdown and recitations:"
+        "shareTextLink": "🔗 View keyword linguistic breakdown and recitations:",
+        "subStatusFree": "You are currently on the Free plan.",
+        "subStatusSubscribed": "You're currently subscribed to the {plan} plan. Manage your subscription on the Google Play/AppStore (depending on device).",
+        "planMonthly": "monthly",
+        "planYearly": "yearly",
+        "planPremium": "premium"
     },
     "ms": {
         "appTitle": "Ayat Al-Qur'an Pilihan Harian",
@@ -165,7 +171,12 @@ const locales = {
         "shareDeviceLabel": "Kongsi melalui Peranti...",
         "shareTextHeader": "📖 Ayat Al-Qur'an Pilihan Harian",
         "shareTextVerses": "Ayat",
-        "shareTextLink": "🔗 Lihat huraian linguistik kata kunci dan bacaan:"
+        "shareTextLink": "🔗 Lihat huraian linguistik kata kunci dan bacaan:",
+        "subStatusFree": "Anda kini menggunakan pelan Percuma.",
+        "subStatusSubscribed": "Anda kini melanggan pelan {plan}. Urus langganan anda di Google Play/AppStore (mengikut peranti).",
+        "planMonthly": "Bulanan",
+        "planYearly": "Tahunan",
+        "planPremium": "Premium"
     }
 };
 
@@ -315,9 +326,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Web visibility change listener
-    document.addEventListener("visibilitychange", () => {
+    document.addEventListener("visibilitychange", async () => {
         if (document.visibilityState === "visible") {
             checkAndRefreshDate();
+            await checkSubscriptionStatus();
         }
     });
 
@@ -572,10 +584,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             App.addListener('backButton', () => {
                 App.exitApp();
             });
-            App.addListener('appStateChange', ({ isActive }) => {
+            App.addListener('appStateChange', async ({ isActive }) => {
                 if (isActive) {
                     console.log("[DEBUG CLIENT] Capacitor App resumed to foreground.");
                     checkAndRefreshDate();
+                    await checkSubscriptionStatus();
                 }
             });
         }
@@ -586,6 +599,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ==========================================
     async function loadPassageForDate(dateObj) {
         const dateStr = getLocalDateString(dateObj);
+        const localTodayStr = getLocalDateString(new Date());
+
+        // Redirect to today if attempting to load a past date without active subscription
+        if (dateStr < localTodayStr && !isSubscribed) {
+            console.warn(`[DEBUG CLIENT] Access denied to historical date [${dateStr}]. Redirecting to today.`);
+            currentDateInstance = new Date();
+            showPaywall();
+            return loadPassageForDate(currentDateInstance);
+        }
+
         console.log(`[DEBUG CLIENT] Fetching Passage For: [${dateStr}] in language [${currentLanguage}]`);
 
         // Stop any active audio playback when date changes
@@ -1084,6 +1107,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         const aboutVersionLabel = document.getElementById("about-version-label");
         if (aboutVersionLabel) {
             aboutVersionLabel.innerText = `${lang === "ms" ? "Versi" : "Version"} ${APP_VERSION}`;
+        }
+
+        // About Modal subscription status
+        const subStatusEl = document.getElementById("about-subscription-status");
+        if (subStatusEl) {
+            if (isSubscribed && activePlanType) {
+                const planName = activePlanType === "yearly" ? strings.planYearly : (activePlanType === "monthly" ? strings.planMonthly : strings.planPremium);
+                subStatusEl.innerText = strings.subStatusSubscribed.replace("{plan}", planName);
+                subStatusEl.style.color = "var(--accent)";
+            } else {
+                subStatusEl.innerText = strings.subStatusFree;
+                subStatusEl.style.color = "var(--text-muted)";
+            }
         }
     }
 
@@ -1668,6 +1704,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log("[DEBUG CLIENT] Unlocked! Instantly unblurring premium sections...");
             renderPassage(activePassageData);
         }
+
+        // Revalidate subscription to determine the active plan type and refresh the About modal
+        checkSubscriptionStatus();
     }
 
     async function purchaseHuaweiSubscription(productId) {
@@ -1751,6 +1790,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log(`[DEBUG CLIENT] Web simulation mode: unlocking premium access via ${packageType} option`);
             const expiryTime = Date.now() + 5 * 60 * 1000; // 5 minutes in ms
             localStorage.setItem("simulated_subscription_expiry", expiryTime);
+            localStorage.setItem("simulated_subscription_plan", packageType);
             unlockPremiumAccess(`Simulated ${packageType.toUpperCase()} Subscription Active! Unlocked (active for 5 mins).`);
         }
     }
@@ -1834,29 +1874,42 @@ document.addEventListener("DOMContentLoaded", async () => {
         return false;
     }
 
-    // Async startup sequence to check query date parameters and authenticate subscriptions safely
-    async function startApp() {
-        // Load bookmarks on startup
-        loadBookmarks();
+    async function checkSubscriptionStatus() {
+        let subscriptionActive = false;
+        let planType = null;
 
-        // Apply localization table
-        applyLocalization(currentLanguage);
-
-        // Fetch active build flavor from native plugin bridge
-        if (isCapacitor && window.Capacitor.Plugins.BuildInfo) {
-            try {
-                const info = await window.Capacitor.Plugins.BuildInfo.getBuildFlavor();
-                window.buildFlavor = info.flavor || 'gms';
-            } catch (err) {
-                console.warn("[DEBUG CLIENT] Failed to fetch build flavor from native plugin:", err);
+        // Check if simulated subscription is still active (5-minute persistence)
+        const simulatedExpiry = localStorage.getItem("simulated_subscription_expiry");
+        if (simulatedExpiry) {
+            if (Number(simulatedExpiry) > Date.now()) {
+                subscriptionActive = true;
+                planType = localStorage.getItem("simulated_subscription_plan") || "monthly";
+                console.log("[DEBUG CLIENT] Stored simulated subscription is active. Plan: " + planType);
+            } else {
+                localStorage.removeItem("simulated_subscription_expiry");
+                localStorage.removeItem("simulated_subscription_plan");
+                console.log("[DEBUG CLIENT] Stored simulated subscription expired.");
             }
         }
-        console.log("[DEBUG CLIENT] Active build flavor:", window.buildFlavor);
 
         // Validate subscription status if in Capacitor wrapper
         if (isCapacitor) {
             if (window.buildFlavor === 'hms') {
-                await checkHuaweiActiveSubscriptions();
+                subscriptionActive = await checkHuaweiActiveSubscriptions();
+                if (subscriptionActive) {
+                    if (window.HMSIAP) {
+                        try {
+                            const ownedReq = { priceType: 2 };
+                            const ownedResult = await window.HMSIAP.obtainOwnedPurchases(ownedReq);
+                            if (ownedResult.returnCode === 0 && ownedResult.itemList && ownedResult.itemList.length > 0) {
+                                const hasYearly = ownedResult.itemList.some(item => item.productId.includes("yearly"));
+                                planType = hasYearly ? "yearly" : "monthly";
+                            }
+                        } catch (err) {
+                            planType = "monthly";
+                        }
+                    }
+                }
             } else {
                 const { Purchases } = window.Capacitor.Plugins;
                 if (Purchases) {
@@ -1869,28 +1922,33 @@ document.addEventListener("DOMContentLoaded", async () => {
                         console.log("[DEBUG CLIENT] RevenueCat configured.");
 
                         const customerInfo = await Purchases.getCustomerInfo();
-                        if (customerInfo.entitlements.active['premium_access']) {
-                            isSubscribed = true;
-                            console.log("[DEBUG CLIENT] User is subscribed to premium archive access.");
+                        const premiumEntitlement = customerInfo.entitlements.active['premium_access'];
+                        if (premiumEntitlement) {
+                            subscriptionActive = true;
+                            const prodId = premiumEntitlement.productIdentifier || "";
+                            if (prodId.includes("yearly") || prodId.includes("annual")) {
+                                planType = "yearly";
+                            } else if (prodId.includes("monthly")) {
+                                planType = "monthly";
+                            } else {
+                                planType = "premium";
+                            }
+                            console.log(`[DEBUG CLIENT] User is subscribed. Active plan: ${planType}`);
+                        } else {
+                            console.log("[DEBUG CLIENT] User is not subscribed.");
                         }
                     } catch (err) {
-                        console.warn("[DEBUG CLIENT] RevenueCat configuration or validation failed on start:", err);
+                        console.warn("[DEBUG CLIENT] RevenueCat validation failed:", err);
                     }
                 }
             }
         }
 
-        // Check if simulated subscription is still active (5-minute persistence)
-        const simulatedExpiry = localStorage.getItem("simulated_subscription_expiry");
-        if (simulatedExpiry) {
-            if (Number(simulatedExpiry) > Date.now()) {
-                isSubscribed = true;
-                console.log("[DEBUG CLIENT] Stored simulated subscription is active. Expiry: " + new Date(Number(simulatedExpiry)).toLocaleTimeString());
-            } else {
-                localStorage.removeItem("simulated_subscription_expiry");
-                console.log("[DEBUG CLIENT] Stored simulated subscription expired.");
-            }
-        }
+        isSubscribed = subscriptionActive;
+        activePlanType = planType;
+
+        // Apply localization to update the subscription label on the About modal
+        applyLocalization(currentLanguage);
 
         // Update bookmarks drawer display status and notifications based on active entitlement check
         if (isSubscribed) {
@@ -1910,7 +1968,39 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Cancel any previously scheduled alerts
             cancelDailyNotifications();
+
+            // Redirect to today if viewing historical date
+            const activeDateStr = getLocalDateString(currentDateInstance);
+            const localTodayStr = getLocalDateString(new Date());
+            if (activeDateStr < localTodayStr) {
+                console.warn(`[DEBUG CLIENT] Active date [${activeDateStr}] is gated and user is unsubscribed. Redirecting to today's date.`);
+                currentDateInstance = new Date();
+                loadPassageForDate(currentDateInstance);
+            }
         }
+    }
+
+    // Async startup sequence to check query date parameters and authenticate subscriptions safely
+    async function startApp() {
+        // Load bookmarks on startup
+        loadBookmarks();
+
+        // Apply localization table
+        applyLocalization(currentLanguage);
+
+        // Fetch active build flavor from native plugin bridge
+        if (isCapacitor && window.Capacitor.Plugins.BuildInfo) {
+            try {
+                const info = await window.Capacitor.Plugins.BuildInfo.getBuildFlavor();
+                window.buildFlavor = info.flavor || 'gms';
+            } catch (err) {
+                console.warn("[DEBUG CLIENT] Failed to fetch build flavor from native plugin:", err);
+            }
+        }
+        console.log("[DEBUG CLIENT] Active build flavor:", window.buildFlavor);
+
+        // Fetch and apply subscription status
+        await checkSubscriptionStatus();
 
         // Check query date parameter
         const urlParams = new URLSearchParams(window.location.search);
@@ -1918,8 +2008,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const localTodayStr = getLocalDateString(new Date());
 
         if (urlDateStr && /^\d{4}-\d{2}-\d{2}$/.test(urlDateStr)) {
-            const parts = urlDateStr.split('-');
-            currentDateInstance = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            if (urlDateStr < localTodayStr && !isSubscribed) {
+                console.log("[DEBUG CLIENT] Gating startup date query (historical date and unsubscribed). Loading today instead.");
+                currentDateInstance = new Date();
+                showPaywall();
+            } else {
+                const parts = urlDateStr.split('-');
+                currentDateInstance = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            }
             // Clear URL date query parameter after parsing to avoid sticky url state on reload
             try {
                 const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
