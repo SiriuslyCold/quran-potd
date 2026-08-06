@@ -900,38 +900,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         btn.classList.add("playing");
 
         // Instantiate
-        activeAudio = new Audio(audioUrl);
+        const audioInstance = new Audio(audioUrl);
+        activeAudio = audioInstance;
         activeAudioButton = btn;
 
         // Binds
-        activeAudio.onended = () => {
+        audioInstance.onended = () => {
             btn.classList.remove("playing");
-            activeAudio = null;
-            activeAudioButton = null;
+            if (activeAudio === audioInstance) {
+                activeAudio = null;
+                activeAudioButton = null;
+            }
             console.log("[DEBUG CLIENT] Audio ended.");
         };
 
-        activeAudio.onpause = () => {
+        audioInstance.onpause = () => {
             btn.classList.remove("playing");
-            activeAudio = null;
-            activeAudioButton = null;
+            if (activeAudio === audioInstance) {
+                activeAudio = null;
+                activeAudioButton = null;
+            }
             console.log("[DEBUG CLIENT] Audio paused.");
         };
 
-        activeAudio.onerror = (e) => {
+        audioInstance.onerror = (e) => {
             btn.classList.remove("playing");
-            activeAudio = null;
-            activeAudioButton = null;
+            if (activeAudio === audioInstance) {
+                activeAudio = null;
+                activeAudioButton = null;
+            }
             console.error("[DEBUG CLIENT] Audio loading error:", e);
             showToast("⚠️ Audio file not found or failed to load");
         };
 
         // Execution
-        activeAudio.play().catch(err => {
+        audioInstance.play().catch(err => {
             console.error("[DEBUG CLIENT] Audio play failed:", err);
             btn.classList.remove("playing");
-            activeAudio = null;
-            activeAudioButton = null;
+            if (activeAudio === audioInstance) {
+                activeAudio = null;
+                activeAudioButton = null;
+            }
             showToast("⚠️ Playback failed. Check network.");
         });
     }
