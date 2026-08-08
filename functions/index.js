@@ -181,7 +181,12 @@ async function generatePassageForDate(todayStr, lang, bucket, selection = null) 
 
     Instructions:
     1. For the "translations" field in the JSON response, output the translation block. Fill in any missing translations if marked as "[Pending generation]". Make sure to output exactly the provided translation if it is given. All translation text must be in ${fullLanguageName}.
-    2. Construct a brief contextual summary overview detailing how these surrounding verses tie together. Use simple, warm, clear, and highly accessible language suited for a layperson. Write this summary and the reflective prompt entirely in ${fullLanguageName}. You MUST creatively personalize it by adding a thoughtful, reflective prompt at the end (e.g., asking how this verse affects their thinking, or how it can help them navigate their day and challenges). Keep this reflection question simple, direct, and practical for daily life. This personalized section MUST be separated from the main overview paragraph by a paragraph break (a double newline / blank line: \n\n).
+    2. Construct a brief contextual summary overview detailing how these surrounding verses tie together, written entirely in ${fullLanguageName}. The overview must end with a thoughtful, reflective prompt (call to action) that is separated from the main overview by a paragraph break (a double newline / blank line: \n\n).
+       For both the summary overview and the reflective prompt call to action, you MUST strictly adhere to the following tone guidelines:
+       - Provide a non-religious, descriptive rendering that translates the core systemic function into clear, warm, and easily understood language.
+       - Explain the concept as a practical, real-world commitment to living by the system's principles and maintaining shared balance, integrity, and harmony.
+       - Avoid robotic, mechanical, or overly abstract terminology (e.g., "feedback loop", "data point matrix", "socio-dynamic homeostasis"). Frame the synthesis in human-centric terms that relate directly to everyday choices and community well-being.
+       - Keep the reflection question simple, direct, and practical for daily life, encouraging self-reflection or constructive real-world actions.
     3. For the "tasreef" field in the JSON response:
        - Map the provided word-level morphological analysis (if available) into the output format.
        - [CRITICAL LIMIT] If the provided word-level morphological analysis contains more than 5 words, select and output strictly the 5 most relevant words that best align with and illustrate the thematic overview of this passage.

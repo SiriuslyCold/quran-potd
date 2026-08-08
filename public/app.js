@@ -1,3 +1,6 @@
+// Toggle simulated subscription for testing (accelerated timelines of 5 minutes)
+const IS_TESTING_MODE = true;
+
 // Verified frontend Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAib8FrGuN66PJXvY-4XSoKAy3pEzJDpKU",
@@ -959,6 +962,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         diagInfo += `IsSubscribed: ${isSubscribed}\n`;
         diagInfo += `ActivePlanType: ${activePlanType}\n`;
         diagInfo += `IsCapacitor: ${isCapacitor}\n`;
+        diagInfo += `Testing Mode (IS_TESTING_MODE): ${IS_TESTING_MODE}\n`;
+
         if (isCapacitor) {
             diagInfo += `Platform: ${window.Capacitor.getPlatform()}\n`;
             try {
@@ -978,6 +983,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 diagInfo += `RC Error: ${err.message || JSON.stringify(err)}\n`;
             }
         }
+        
         alert(diagInfo);
     }
 
@@ -1838,7 +1844,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function purchaseSubscription(packageType, fallbackProductId) {
         console.log(`[DEBUG CLIENT] Purchase requested for packageType: ${packageType}`);
-        if (isCapacitor) {
+        if (isCapacitor && !IS_TESTING_MODE) {
             if (window.buildFlavor === 'hms') {
                 await purchaseHuaweiSubscription(fallbackProductId);
                 return;
@@ -1877,8 +1883,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }
         } else {
-            // Browser testing simulation triggers simulated purchase and sets subscriber flag true
-            console.log(`[DEBUG CLIENT] Web simulation mode: unlocking premium access via ${packageType} option`);
+            // Browser testing simulation or forced simulation triggers simulated purchase and sets subscriber flag true
+            console.log(`[DEBUG CLIENT] Simulation mode: unlocking premium access via ${packageType} option`);
             const expiryTime = Date.now() + 5 * 60 * 1000; // 5 minutes in ms
             localStorage.setItem("simulated_subscription_expiry", expiryTime);
             localStorage.setItem("simulated_subscription_plan", packageType);
@@ -1984,7 +1990,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         // Validate subscription status if in Capacitor wrapper
-        if (isCapacitor) {
+        if (isCapacitor && !IS_TESTING_MODE) {
             if (window.buildFlavor === 'hms') {
                 subscriptionActive = await checkHuaweiActiveSubscriptions();
                 if (subscriptionActive) {
