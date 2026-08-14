@@ -1,5 +1,5 @@
 // Toggle simulated subscription for testing (accelerated timelines of 5 minutes)
-const IS_TESTING_MODE = true;
+const IS_TESTING_MODE = false;
 
 // Verified frontend Firebase configuration
 const firebaseConfig = {
