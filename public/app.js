@@ -40,7 +40,7 @@ let activeAudioButton = null; // Currently playing verse button DOM reference
 
 const OG_DESCRIPTION = "Explore daily linguistic breakdowns, morphological analysis, and clear contextual overviews of the Qur'an.";
 const OG_IMAGE = "https://quran-potd.web.app/quran-potd-social.jpg";
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.5.0";
 
 const locales = {
     "en": {
@@ -55,7 +55,7 @@ const locales = {
         "themeSystem": "System",
         "settingsLanguage": "App Language",
         "settingsTranslationMode": "Translation Mode",
-        "translationModeTasreef": "Tasreef (Academic)",
+        "translationModeTasreef": "Tasreef (Experimental)",
         "translationModeDefault": "Default",
         "settingsArabicSize": "Arabic Text Size",
         "settingsTranslationSize": "Translation Text Size",
@@ -124,7 +124,7 @@ const locales = {
         "themeSystem": "Sistem",
         "settingsLanguage": "Bahasa Aplikasi",
         "settingsTranslationMode": "Mod Terjemahan",
-        "translationModeTasreef": "Tasreef (Akademik)",
+        "translationModeTasreef": "Tasreef (Eksperimen)",
         "translationModeDefault": "Biasa (Default)",
         "settingsArabicSize": "Saiz Teks Arab",
         "settingsTranslationSize": "Saiz Teks Terjemahan",
@@ -849,7 +849,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             let wordHtml = "";
             if (wordTransliteration) {
-                wordHtml = `<div class="tasreef-word">${wordArabic} <span class="tasreef-word-translit" style="font-size: 0.95rem; font-family: inherit; font-style: italic; font-weight: normal; color: var(--text-muted); margin-right: 0.4rem; direction: ltr; display: inline-block; vertical-align: middle;">(${wordTransliteration})</span></div>`;
+                wordHtml = `<div class="tasreef-word">${wordArabic} <span class="tasreef-word-translit">(${wordTransliteration})</span></div>`;
             } else {
                 wordHtml = `<div class="tasreef-word">${wordArabic}</div>`;
             }

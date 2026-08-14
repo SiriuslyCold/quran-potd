@@ -24,7 +24,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/png" href="img/quran-potd-logo.png">
-    <link rel="stylesheet" href="main.css?v=1.4.0"> 
+    <link rel="stylesheet" href="main.css?v=1.5.0"> 
 
     <!-- Open Graph Meta Tags -->
     <meta id="og:type" property="og:type" content="website" />
@@ -226,23 +226,22 @@
             
             <div class="modal-body">
                 <p><strong>Welcome to Qur'an Passage of the Day</strong></p>
-                <p>Qur'an Passage of the Day is a web platform and mobile application designed to foster a deeper, structurally focused relationship with the text of the Holy Qur'an. Rather than isolating individual verses, this application anchors a random selection within its immediate context, presenting a micro-passage to preserve the natural thematic flow and narrative integrity of the revelation.</p>
-                
-                <p><strong>How It Works</strong></p>
-                <p>Each day, a synchronized backend process randomly selects a localized text window. Using advanced generative AI processing operating under strict linguistic constraints, the platform dynamically assembles:</p>
-                <ul class="modal-list">
-                    <li><strong>Contextual Translation:</strong> A unified, sequential English translation adhering strictly to standard UK spelling conventions.</li>
-                    <li><strong>Thematic Analysis:</strong> A concise overview detailing the connective ties and structural themes binding the surrounding verses together.</li>
-                    <li><strong>Classical Tasreef:</strong> A morphological breakdown of key action words, identifying their triliteral Arabic root (جذر), structural pattern weight (وزن), and grammatical classifications. In Arabic grammar, a <strong>triliteral root</strong> (al-jathr) is a core group of three consonant letters that carries the fundamental, broad meaning of a word family. The <strong>pattern weight</strong> (al-wazn, literally "balance" or "scale") acts as a standardized template or "cookie cutter" that determines the exact grammatical function of the word - such as turning a general concept into a past-tense verb, an active doer, a place, or a tool.</li>
-                </ul>
-                
-                <p><strong>Our Linguistic Philosophy</strong></p>
-                <p>To ensure absolute academic clarity, the AI relies entirely on internal structural morphology and the classical Minimal Uthmanic Rasm. It deliberately operates without importing external narrative layers, historical interpretations, secondary Hadith literature, or Seerah commentaries. The result is a pure, language-first analysis dedicated entirely to the intrinsic grammar, vocabulary, and structural framework of the text.</p>
-                <p>Powered by Gemini 3.1 and the QuranExplorer linguistic framework. Default English translation courtesy of Safi Kaskas, Malay translation by Othman Ali. Audio from the Quran API project (https://quranapi.pages.dev/)</p>
+
+				<p>The Qur’an itself tells us that God teaches (55:2), explains (75:19), and presents the best interpretation (25:33) of the Qur’an. Its own prescribed methodology for achieving this is known as <em>tasreef</em> (6:65, 6:105) - the deliberate variation of examples, narratives, and functional data points (<em>Ayat</em>) to ensure that a core truth is presented from multiple vantage points. For a human, the task of tracking the variations and relationships across the 6236 verses is challenging and time consuming.</p>
+				
+				<p>As an example of the process, instead of isolating <em>waidribuhunna</em> in verse 4:34, the system cross-references every instance of the root <em>d-r-b</em> across the corpus in their contexts. The usage pattern reveals <em>d-r-b</em> consistently means "to set forth," "to turn away," or "to cite examples" in the internal context of the book, independent of centuries of readings layered with interpretation and culture, which too often renders <em>waidribuhunna</em> as "to beat".</p>
+
+				<p>This app harnesses the pattern-matching capabilities of Large Language Models (LLMs), employing AI to build the web of meanings and words. With technology doing the heavy lifting, your mind is freed and empowered to learn, reflect deeply – engage in <em>tadabbur</em> – and continue your journey of personal, spiritual and moral edification. For just as <em>tasreef</em> governs scripture, so it appears in the dynamic, recurring patterns of Nature. And our aspiration is to foster a deeper relationship between you and the Qur’anic text, thus with the observable cosmos.</p>
+
+				<p>Each day, this app presents a randomly selected passage in its immediate context, preserving the natural thematic flow of the text. The passage is displayed with a standard translation - in English by Dr Safi Kaskas, or Bahasa Melayu by Othman Ali - or you can choose the experimental tasreef-derived rendering in either language. The app then provides a Thematic Overview based on <em>tasreef</em> by the AI semantic engine, followed by morphological analysis of key words of the passage.</p>
+				
+				<p><strong>Note:</strong> In Arabic grammar, a triliteral root (<em>al-jathr</em>) is a core group of three consonant letters that carries the fundamental, broad meaning of a word family. The pattern weight (<em>al-wazn</em>, literally "balance" or "scale") acts as a standardized template that determines the exact grammatical function of the word - such as turning a general concept into a past-tense verb, an active doer, a place, or a tool.</p>
+
+                <p>Powered by Gemini 3.1 and the QuranExplorer linguistic framework. Audio from the Quran API project (https://quranapi.pages.dev/)</p>
                 
                 <p class="modal-footer-credit">Brought to you by Muslims for Progressive Values</p>
                 <p id="about-subscription-status" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 1rem; margin-bottom: -0.4rem; font-weight: 500;"></p>
-                <p id="about-version-label" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.8rem; margin-bottom: 0;">Version 1.4.0</p>
+                <p id="about-version-label" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.8rem; margin-bottom: 0;">Version 1.5.0</p>
             </div>
         </div>
     </div>
@@ -382,6 +381,6 @@
     <!-- Toast Notification Popup -->
     <div id="copy-toast" class="toast hidden">✅ Passage copied to clipboard!</div>
 
-    <script type="module" src="app.js?v=1.4.0"></script>
+    <script type="module" src="app.js?v=1.5.0"></script>
 </body>
 </html>
