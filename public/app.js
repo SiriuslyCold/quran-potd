@@ -35,6 +35,7 @@ try {
 let currentThemeSetting = 'system'; // 'light' | 'dark' | 'system'
 let isSubscribed = false; // Subscription entitlement status flag
 let activePlanType = null; // Plan type: 'monthly', 'yearly', or null
+let hideNavArrows = false; // Override flag to force-hide date navigation
 let activeAudio = null; // Active HTML5 Audio playback reference instance
 let activeAudioButton = null; // Currently playing verse button DOM reference
 
@@ -80,7 +81,9 @@ const locales = {
         "paywallYearly": "Subscribe Yearly - $19.99 / yr",
         "paywallSave": "Save 16%",
         "paywallRestore": "Restore Purchases",
-        "paywallTerms": "Charges applied to Apple App Store / Google Play account. Cancel anytime via device settings.",
+        "paywallPrivacy": "Privacy Policy",
+        "paywallTermsLink": "Terms of Use",
+        "paywallTerms": "Payment will be charged to your iTunes/Google Play account at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period. Your account will be charged for renewal within 24-hours prior to the end of the current period. Subscriptions may be managed by the user and auto-renewal may be turned off by going to Account Settings after purchase. Any unused portion of a free trial period, if offered, will be forfeited when you purchase a subscription.",
         "paywallSimulation": "ℹ️ Simulation Mode: Purchases are simulated for evaluation purposes. No real money is charged.",
         "loaderText": "Retrieving passage...",
         "toastBookmarkAdded": "✅ Passage bookmarked!",
@@ -149,7 +152,9 @@ const locales = {
         "paywallYearly": "Langgan Tahunan - RM39.90 setahun",
         "paywallSave": "Jimat 16%",
         "paywallRestore": "Pulihkan Pembelian",
-        "paywallTerms": "Caj dikenakan ke akaun Apple App Store / Google Play. Batal bila-bila masa di tetapan peranti.",
+        "paywallPrivacy": "Dasar Privasi",
+        "paywallTermsLink": "Syarat Penggunaan",
+        "paywallTerms": "Bayaran akan dicaj ke akaun iTunes/Google Play anda semasa pengesahan pembelian. Langganan diperbaharui secara automatik melainkan pembaharuan automatik dimatikan sekurang-kurangnya 24 jam sebelum tamat tempoh semasa. Akaun anda akan dicaj untuk pembaharuan dalam tempoh 24 jam sebelum tamat tempoh semasa. Langganan boleh diuruskan oleh pengguna dan pembaharuan automatik boleh dimatikan dengan pergi ke Tetapan Akaun selepas pembelian. Sebarang bahagian percubaan percuma yang tidak digunakan, jika ditawarkan, akan terbatal apabila anda membeli langganan.",
         "paywallSimulation": "ℹ️ Mod Simulasi: Pembelian disimulasikan untuk tujuan penilaian. Tiada wang sebenar yang dicaj.",
         "loaderText": "Memuat turun ayat...",
         "toastBookmarkAdded": "✅ Ayat ditanda buku!",
@@ -605,7 +610,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const localTodayStr = getLocalDateString(new Date());
 
         // Redirect to today if attempting to load a past date without active subscription
-        if (dateStr < localTodayStr && !isSubscribed) {
+        if (dateStr < localTodayStr && !isSubscribed && !hideNavArrows) {
             console.warn(`[DEBUG CLIENT] Access denied to historical date [${dateStr}]. Redirecting to today.`);
             currentDateInstance = new Date();
             showPaywall();
@@ -737,6 +742,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function configureNavArrows(data, activeDateStr) {
+        if (hideNavArrows) {
+            if (prevBtn) prevBtn.classList.add("hidden");
+            if (nextBtn) nextBtn.classList.add("hidden");
+            return;
+        }
+
         if (data && data.hasPreviousDay) prevBtn.classList.remove("hidden");
         else prevBtn.classList.add("hidden");
 
@@ -1097,6 +1108,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         const paywallTermsLabel = document.getElementById("paywall-terms-label");
         if (paywallTermsLabel) paywallTermsLabel.innerText = strings.paywallTerms;
 
+        const paywallPrivacyLink = document.getElementById("paywall-privacy-link");
+        if (paywallPrivacyLink) paywallPrivacyLink.innerText = strings.paywallPrivacy;
+
+        const paywallTermsLink = document.getElementById("paywall-terms-link");
+        if (paywallTermsLink) paywallTermsLink.innerText = strings.paywallTermsLink;
+
+        const aboutPrivacyLink = document.getElementById("about-privacy-link");
+        if (aboutPrivacyLink) aboutPrivacyLink.innerText = strings.paywallPrivacy;
+
+        const aboutTermsLink = document.getElementById("about-terms-link");
+        if (aboutTermsLink) aboutTermsLink.innerText = strings.paywallTermsLink;
+
         const paywallSimulationLabel = document.getElementById("paywall-simulation-label");
         if (paywallSimulationLabel) paywallSimulationLabel.innerText = strings.paywallSimulation;
 
@@ -1259,7 +1282,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function showPaywall() {
-        if (paywallModal) paywallModal.classList.remove("hidden");
+        if (paywallModal) {
+            if (!isCapacitor) {
+                // Adapt standard paywall modal to be a Download App promotion on Web
+                const paywallTitle = document.getElementById("paywall-title-label");
+                const paywallDesc = document.getElementById("paywall-description-label");
+                if (paywallTitle) paywallTitle.textContent = "Unlock the Archive on the App";
+                if (paywallDesc) paywallDesc.textContent = "Accessing historical days, searching the archive, and bookmarking passages are features available in our mobile app.";
+
+                // Hide native trial, purchase buttons, terms, and simulation warning
+                const paywallActions = paywallModal.querySelector(".paywall-actions");
+                const paywallTerms = document.getElementById("paywall-terms-label");
+                const paywallLinksContainer = document.getElementById("paywall-links-container");
+                const paywallSimLabel = document.getElementById("paywall-simulation-label");
+                if (paywallActions) paywallActions.classList.add("hidden");
+                if (paywallTerms) paywallTerms.classList.add("hidden");
+                if (paywallLinksContainer) paywallLinksContainer.classList.add("hidden");
+                if (paywallSimLabel) paywallSimLabel.classList.add("hidden");
+
+                // Show web promotional badges
+                const paywallWebPromo = document.getElementById("paywall-web-promo");
+                if (paywallWebPromo) paywallWebPromo.classList.remove("hidden");
+            }
+            paywallModal.classList.remove("hidden");
+        }
     }
 
     if (paywallCloseBtn) {
@@ -1434,6 +1480,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (bookmarksModal) bookmarksModal.classList.add("hidden");
                 const parts = bm.date.split('-');
                 currentDateInstance = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                hideNavArrows = false; // Restore navigation arrows when navigating from bookmarks
                 loadPassageForDate(currentDateInstance);
             };
 
@@ -1687,6 +1734,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (searchModal) searchModal.classList.add("hidden");
                 const parts = res.date.split('-');
                 currentDateInstance = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                hideNavArrows = false; // Restore navigation arrows when navigating from search
                 loadPassageForDate(currentDateInstance);
             };
 
@@ -2099,20 +2147,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Fetch and apply subscription status
         await checkSubscriptionStatus();
 
+        // Show permanent web app store badges if running on standard web browser
+        if (!isCapacitor) {
+            const webBadges = document.getElementById("web-appstore-badges");
+            if (webBadges) webBadges.classList.remove("hidden");
+        }
+
         // Check query date parameter
         const urlParams = new URLSearchParams(window.location.search);
         const urlDateStr = urlParams.get("date");
-        const localTodayStr = getLocalDateString(new Date());
 
         if (urlDateStr && /^\d{4}-\d{2}-\d{2}$/.test(urlDateStr)) {
-            if (urlDateStr < localTodayStr && !isSubscribed) {
-                console.log("[DEBUG CLIENT] Gating startup date query (historical date and unsubscribed). Loading today instead.");
-                currentDateInstance = new Date();
-                showPaywall();
-            } else {
-                const parts = urlDateStr.split('-');
-                currentDateInstance = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            // Shared link landing: bypass gating check, load the specific passage, and hide date nav arrows
+            const parts = urlDateStr.split('-');
+            currentDateInstance = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            hideNavArrows = true;
+
+            // Encourage installing the app if landing on web
+            if (!isCapacitor) {
+                const sharedPromo = document.getElementById("shared-landing-promo");
+                if (sharedPromo) sharedPromo.classList.remove("hidden");
             }
+
             // Clear URL date query parameter after parsing to avoid sticky url state on reload
             try {
                 const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;

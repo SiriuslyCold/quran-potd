@@ -1221,3 +1221,35 @@ body.theme-light .paywall-primary-btn {
     border-color: var(--gold) !important;
     box-shadow: 0 0 8px rgba(212, 175, 55, 0.25);
 }
+
+/* App Store Badges (Web Promo & Bottom Footer Links) */
+.web-appstore-badges {
+    transition: opacity 0.3s ease;
+}
+
+.store-badge-link {
+    display: inline-block;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+}
+
+.store-badge-link:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.store-badge-link:active {
+    transform: translateY(0) scale(0.98);
+}
+
+#shared-landing-promo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    #shared-landing-promo {
+        grid-column: 1 / span 2;
+    }
+}
