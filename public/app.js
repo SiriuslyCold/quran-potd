@@ -41,7 +41,7 @@ let activeAudioButton = null; // Currently playing verse button DOM reference
 
 const OG_DESCRIPTION = "Explore daily linguistic breakdowns, morphological analysis, and clear contextual overviews of the Qur'an.";
 const OG_IMAGE = "https://quran-potd.web.app/quran-potd-social.jpg";
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.6.0";
 
 const locales = {
     "en": {
