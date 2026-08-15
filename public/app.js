@@ -85,6 +85,12 @@ const locales = {
         "paywallTermsLink": "Terms of Use",
         "paywallTerms": "Payment will be charged to your iTunes/Google Play account at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period. Your account will be charged for renewal within 24-hours prior to the end of the current period. Subscriptions may be managed by the user and auto-renewal may be turned off by going to Account Settings after purchase. Any unused portion of a free trial period, if offered, will be forfeited when you purchase a subscription.",
         "paywallSimulation": "ℹ️ Simulation Mode: Purchases are simulated for evaluation purposes. No real money is charged.",
+        "updateTitle": "Update Available",
+        "updateDescOptional": "A new version of Qur'an Passage of the Day is available. Please update to enjoy the latest features and enhancements.",
+        "updateDescMandatory": "A critical update is available. You must update the app to continue using the service.",
+        "updateVersionInfo": "New version: {version}",
+        "updateNow": "Update Now",
+        "updateLater": "Later",
         "loaderText": "Retrieving passage...",
         "toastBookmarkAdded": "✅ Passage bookmarked!",
         "toastBookmarkRemoved": "❌ Bookmark removed!",
@@ -156,6 +162,12 @@ const locales = {
         "paywallTermsLink": "Syarat Penggunaan",
         "paywallTerms": "Bayaran akan dicaj ke akaun iTunes/Google Play anda semasa pengesahan pembelian. Langganan diperbaharui secara automatik melainkan pembaharuan automatik dimatikan sekurang-kurangnya 24 jam sebelum tamat tempoh semasa. Akaun anda akan dicaj untuk pembaharuan dalam tempoh 24 jam sebelum tamat tempoh semasa. Langganan boleh diuruskan oleh pengguna dan pembaharuan automatik boleh dimatikan dengan pergi ke Tetapan Akaun selepas pembelian. Sebarang bahagian percubaan percuma yang tidak digunakan, jika ditawarkan, akan terbatal apabila anda membeli langganan.",
         "paywallSimulation": "ℹ️ Mod Simulasi: Pembelian disimulasikan untuk tujuan penilaian. Tiada wang sebenar yang dicaj.",
+        "updateTitle": "Kemas Kini Tersedia",
+        "updateDescOptional": "Versi baharu Ayat Al-Qur'an Pilihan Harian telah tersedia. Sila kemas kini untuk menikmati ciri-ciri baharu.",
+        "updateDescMandatory": "Kemas kini kritikal tersedia. Anda mesti mengemas kini aplikasi untuk terus menggunakan perkhidmatan ini.",
+        "updateVersionInfo": "Versi baharu: {version}",
+        "updateNow": "Kemas Kini Sekarang",
+        "updateLater": "Nanti",
         "loaderText": "Memuat turun ayat...",
         "toastBookmarkAdded": "✅ Ayat ditanda buku!",
         "toastBookmarkRemoved": "❌ Tanda buku dibuang!",
@@ -2125,6 +2137,84 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    function isNewerVersion(local, latest) {
+        if (!local || !latest) return false;
+        const localParts = local.split('.').map(Number);
+        const latestParts = latest.split('.').map(Number);
+        for (let i = 0; i < Math.max(localParts.length, latestParts.length); i++) {
+            const localVal = localParts[i] || 0;
+            const latestVal = latestParts[i] || 0;
+            if (latestVal > localVal) return true;
+            if (latestVal < localVal) return false;
+        }
+        return false;
+    }
+
+    async function checkAppUpdate() {
+        if (!isCapacitor) return;
+
+        try {
+            const versionUrl = "https://quran-potd.web.app/version.json";
+            const response = await fetch(versionUrl, { cache: "no-store" });
+            if (!response.ok) throw new Error("Network status code: " + response.status);
+            const data = await response.json();
+
+            const latest = data.latest;
+            const minRequired = data.minRequired;
+
+            if (isNewerVersion(APP_VERSION, latest)) {
+                console.log(`[UPDATE] New version available: ${latest} (Current: ${APP_VERSION})`);
+                
+                const updateModal = document.getElementById("update-modal");
+                const updateCloseBtn = document.getElementById("update-close-btn");
+                const updateTitleLabel = document.getElementById("update-title-label");
+                const updateDescLabel = document.getElementById("update-description-label");
+                const updateVersionInfoText = document.getElementById("update-version-info");
+                const updateNowBtn = document.getElementById("update-now-btn");
+                const updateLaterBtn = document.getElementById("update-later-btn");
+
+                if (!updateModal) return;
+
+                const isMandatory = isNewerVersion(APP_VERSION, minRequired);
+
+                // Setup texts
+                updateTitleLabel.innerText = strings.updateTitle;
+                updateDescLabel.innerText = isMandatory ? strings.updateDescMandatory : strings.updateDescOptional;
+                updateVersionInfoText.innerText = strings.updateVersionInfo.replace("{version}", latest);
+                updateNowBtn.innerText = strings.updateNow;
+                updateLaterBtn.innerText = strings.updateLater;
+
+                // Handle visibility based on mandatory status
+                if (isMandatory) {
+                    if (updateCloseBtn) updateCloseBtn.classList.add("hidden");
+                    if (updateLaterBtn) updateLaterBtn.classList.add("hidden");
+                } else {
+                    if (updateCloseBtn) {
+                        updateCloseBtn.classList.remove("hidden");
+                        updateCloseBtn.onclick = () => updateModal.classList.add("hidden");
+                    }
+                    if (updateLaterBtn) {
+                        updateLaterBtn.classList.remove("hidden");
+                        updateLaterBtn.onclick = () => updateModal.classList.add("hidden");
+                    }
+                }
+
+                // Handle update click
+                updateNowBtn.onclick = async () => {
+                    const isIos = window.Capacitor.getPlatform() === 'ios';
+                    const storeUrl = isIos 
+                        ? (data.url.ios || "https://apps.apple.com/app/your-app-id") 
+                        : (data.url.android || "https://play.google.com/store/apps/details?id=com.mpv.quran_potd");
+                    window.open(storeUrl, "_system");
+                };
+
+                updateModal.classList.remove("hidden");
+            }
+        } catch (err) {
+            console.warn("[UPDATE] Failed to check for updates:", err);
+        }
+    }
+
     // Async startup sequence to check query date parameters and authenticate subscriptions safely
     async function startApp() {
         // Load bookmarks on startup
@@ -2183,6 +2273,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Load passage
         loadPassageForDate(currentDateInstance);
+
+        // Check for application updates (async, non-blocking)
+        checkAppUpdate();
     }
 
     // Begin App Execution

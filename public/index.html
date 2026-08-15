@@ -344,11 +344,7 @@
                     passage.
                 </p>
 
-                <p><strong>Note:</strong> In Arabic grammar, a triliteral root (<em>al-jathr</em>) is a core group of
-                    three consonant letters that carries the fundamental, broad meaning of a word family. The pattern
-                    weight (<em>al-wazn</em>, literally "balance" or "scale") acts as a standardized template that
-                    determines the exact grammatical function of the word - such as turning a general concept into a
-                    past-tense verb, an active doer, a place, or a tool.</p>
+                <p><strong>Note:</strong> In Arabic grammar, a triliteral root (<em>al-jathr</em>) carries the fundamental, broad meaning of a word family, while the pattern weight (<em>al-wazn</em>) acts as a standardized template determining exact grammatical function. The <strong>Key Morphological Analysis</strong> applies this dual framework systematically across the text. By isolating recurring roots and their derived forms, it uncovers semantic clusters across disparate verses or sentences, serving as the foundational mechanism by which the app generates its thematic overview.</p>
 
                 <p>Powered by Gemini 3.1 and the QuranExplorer linguistic framework. Audio from the Quran API project
                     (https://quranapi.pages.dev/)</p>
@@ -582,6 +578,37 @@
                             Device...</span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Glassmorphic Update Modal -->
+    <div id="update-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-card update-modal-card" style="max-width: 380px; width: 90%;">
+            <span id="update-close-btn" class="close-btn hidden">&times;</span>
+            <div class="update-header" style="text-align: center; margin-bottom: 1rem;">
+                <div class="update-icon-container" style="background: var(--gold-light); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(212,175,55,0.15);">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                </div>
+                <h4 id="update-title-label" style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.25rem;">Update Available</h4>
+            </div>
+
+            <div class="modal-body update-body" style="text-align: center; margin-bottom: 1.5rem;">
+                <p id="update-description-label" style="font-size: 0.9rem; color: var(--text-main); line-height: 1.45rem; margin: 0 0 1rem 0;">
+                    A new version of the app is available. Please update to ensure you have the latest features and security improvements.
+                </p>
+                <p id="update-version-info" style="font-size: 0.75rem; color: var(--text-muted); margin: 0; font-weight: 500;">
+                    Version: <span id="update-version-latest">1.5.0</span>
+                </p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.7rem; width: 100%;">
+                <button id="update-now-btn" class="paywall-primary-btn" style="background: var(--gold) !important; color: var(--bg-main) !important; font-weight: 700; border: none; padding: 0.85rem; border-radius: 8px; cursor: pointer; text-align: center; width: 100%;">
+                    Update Now
+                </button>
+                <button id="update-later-btn" class="paywall-secondary-btn" style="border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: var(--text-main); padding: 0.85rem; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;">
+                    Later
+                </button>
             </div>
         </div>
     </div>

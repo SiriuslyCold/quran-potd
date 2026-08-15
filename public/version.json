@@ -1,0 +1,8 @@
+{
+  "latest": "1.5.0",
+  "minRequired": "1.5.0",
+  "url": {
+    "ios": "https://apps.apple.com/app/your-app-id",
+    "android": "https://play.google.com/store/apps/details?id=com.mpv.quran_potd"
+  }
+}
