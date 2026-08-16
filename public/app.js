@@ -41,7 +41,7 @@ let activeAudioButton = null; // Currently playing verse button DOM reference
 
 const OG_DESCRIPTION = "Explore daily linguistic breakdowns, morphological analysis, and clear contextual overviews of the Qur'an.";
 const OG_IMAGE = "https://quran-potd.web.app/quran-potd-social.jpg";
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.6.2";
 
 const locales = {
     "en": {
@@ -293,13 +293,20 @@ function applyTheme(theme) {
     console.log(`[DEBUG CLIENT] Applied theme: ${resolvedTheme} (Setting: ${theme})`);
 
     // Synchronize Capacitor Native Status Bar theme if native environment exists
-    if (typeof window.Capacitor !== 'undefined' && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar) {
-        const { StatusBar } = window.Capacitor.Plugins;
+    if (typeof window.Capacitor !== 'undefined' && window.Capacitor.Plugins) {
+        const { StatusBar, BuildInfo } = window.Capacitor.Plugins;
         try {
             const colorHex = resolvedTheme === 'dark' ? '#020617' : '#f8fafc';
-            StatusBar.setOverlaysWebView({ overlay: false }).catch(err => console.log(err));
-            StatusBar.setBackgroundColor({ color: colorHex }).catch(err => console.log(err));
-            StatusBar.setStyle({ style: resolvedTheme === 'dark' ? 'DARK' : 'LIGHT' }).catch(err => console.log(err));
+            // standard Capacitor StatusBar plugin (used on iOS)
+            if (StatusBar) {
+                StatusBar.setOverlaysWebView({ overlay: true }).catch(err => console.log(err));
+                StatusBar.setBackgroundColor({ color: colorHex }).catch(err => console.log(err));
+                StatusBar.setStyle({ style: resolvedTheme === 'dark' ? 'DARK' : 'LIGHT' }).catch(err => console.log(err));
+            }
+            // custom Android implementation (exposes method in local BuildInfoPlugin)
+            if (BuildInfo && typeof BuildInfo.setStatusBarStyle === 'function') {
+                BuildInfo.setStatusBarStyle({ style: resolvedTheme === 'dark' ? 'DARK' : 'LIGHT' }).catch(err => console.log(err));
+            }
         } catch (err) {
             console.error("Failed to update native status bar theme:", err);
         }
@@ -2051,6 +2058,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Validate subscription status if in Capacitor wrapper
         if (isCapacitor && !IS_TESTING_MODE) {
+            // Reset simulated subscription state for native environment
+            subscriptionActive = false;
+            planType = null;
+
             if (window.buildFlavor === 'hms') {
                 subscriptionActive = await checkHuaweiActiveSubscriptions();
                 if (subscriptionActive) {

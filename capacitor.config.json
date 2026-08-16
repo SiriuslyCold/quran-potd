@@ -5,9 +5,18 @@
   "ios": {
     "contentInset": "always"
   },
+  "android": {
+    "includePlugins": [
+      "@capacitor-community/firebase-analytics",
+      "@capacitor/app",
+      "@capacitor/local-notifications",
+      "@capacitor/share",
+      "@revenuecat/purchases-capacitor"
+    ]
+  },
   "plugins": {
     "StatusBar": {
-      "overlaysWebView": false
+      "overlaysWebView": true
     }
   }
 }

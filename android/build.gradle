@@ -25,6 +25,7 @@ allprojects {
         mavenCentral()
         maven { url 'https://developer.huawei.com/repo/' }
     }
+    buildDir = "${System.getProperty('user.home')}/.gradle-builds/quran-potd/${project.name}"
 }
 
 task clean(type: Delete) {

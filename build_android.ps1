@@ -92,8 +92,13 @@ if ($null -eq $newVersionCode) {
     }
 }
 
-$sourceAab = "$projectDir\android\app\build\outputs\bundle\gmsRelease\app-gms-release.aab"
-$targetAab = "$projectDir\android\app\build\outputs\bundle\gmsRelease\app-gms-release-v$newVersionCode.aab"
+$homeDir = [System.Environment]::GetFolderPath('UserProfile')
+$sourceAab = "$homeDir\.gradle-builds\quran-potd\app\outputs\bundle\gmsRelease\app-gms-release.aab"
+$targetDir = "$projectDir\build-output"
+if (-not (Test-Path $targetDir)) {
+    New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+}
+$targetAab = "$targetDir\app-gms-release-v$newVersionCode.aab"
 if (Test-Path $sourceAab) {
     Copy-Item -Path $sourceAab -Destination $targetAab -Force
 }
@@ -102,7 +107,7 @@ Write-Host "`n==========================================" -ForegroundColor Green
 Write-Host "Build Succeeded!" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Green
 Write-Host "Generated AAB (App Bundle) file is located at:" -ForegroundColor Yellow
-Write-Host " - GMS Release: android\app\build\outputs\bundle\gmsRelease\app-gms-release-v$newVersionCode.aab"
-Write-Host " - (Original):  android\app\build\outputs\bundle\gmsRelease\app-gms-release.aab"
+Write-Host " - GMS Release: build-output\app-gms-release-v$newVersionCode.aab"
+Write-Host " - (Original):  $sourceAab"
 Write-Host "`nNote: If you need to build local APKs instead of AABs, you can run:" -ForegroundColor Cyan
 Write-Host "  .\gradlew.bat assembleGmsRelease"
