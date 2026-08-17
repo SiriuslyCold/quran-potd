@@ -11,7 +11,11 @@ Write-Host "Using JAVA_HOME: $env:JAVA_HOME" -ForegroundColor Green
 
 # Auto-increment Android versionCode and sync iOS CURRENT_PROJECT_VERSION
 $gradlePath = "$projectDir\android\app\build.gradle"
+$pbxprojPath = "$projectDir\ios\App\App.xcodeproj\project.pbxproj"
+$oldAndroidVersion = $null
+$oldIosVersion = $null
 $newVersionCode = $null
+
 if (Test-Path $gradlePath) {
     $content = Get-Content -Path $gradlePath -Raw
     if ($content -match 'versionCode\s+(\d+)') {
@@ -27,20 +31,30 @@ if (Test-Path $gradlePath) {
     Write-Warning "Could not find build.gradle at $gradlePath"
 }
 
-if ($newVersionCode) {
-    $pbxprojPath = "$projectDir\ios\App\App.xcodeproj\project.pbxproj"
-    if (Test-Path $pbxprojPath) {
-        $content = Get-Content -Path $pbxprojPath -Raw
-        if ($content -match 'CURRENT_PROJECT_VERSION\s*=\s*(\d+);') {
-            $oldIosVersion = $Matches[1]
-            $content = $content -replace "CURRENT_PROJECT_VERSION\s*=\s*$oldIosVersion;", "CURRENT_PROJECT_VERSION = $newVersionCode;"
-            [System.IO.File]::WriteAllText($pbxprojPath, $content)
-            Write-Host "Synchronized iOS build number (CURRENT_PROJECT_VERSION) from $oldIosVersion to $newVersionCode" -ForegroundColor Green
-        } else {
-            Write-Warning "Could not parse CURRENT_PROJECT_VERSION in $pbxprojPath"
-        }
+if ($newVersionCode -and (Test-Path $pbxprojPath)) {
+    $content = Get-Content -Path $pbxprojPath -Raw
+    if ($content -match 'CURRENT_PROJECT_VERSION\s*=\s*(\d+);') {
+        $oldIosVersion = $Matches[1]
+        $content = $content -replace "CURRENT_PROJECT_VERSION\s*=\s*$oldIosVersion;", "CURRENT_PROJECT_VERSION = $newVersionCode;"
+        [System.IO.File]::WriteAllText($pbxprojPath, $content)
+        Write-Host "Synchronized iOS build number (CURRENT_PROJECT_VERSION) from $oldIosVersion to $newVersionCode" -ForegroundColor Green
     } else {
-        Write-Warning "Could not find project.pbxproj at $pbxprojPath"
+        Write-Warning "Could not parse CURRENT_PROJECT_VERSION in $pbxprojPath"
+    }
+}
+
+function Revert-Versions {
+    if ($oldAndroidVersion) {
+        $content = Get-Content -Path $gradlePath -Raw
+        $revertedContent = $content -replace "versionCode\s+$newVersionCode", "versionCode $oldAndroidVersion"
+        [System.IO.File]::WriteAllText($gradlePath, $revertedContent)
+        Write-Host "Reverted Android build number back to $oldAndroidVersion" -ForegroundColor Yellow
+    }
+    if ($oldIosVersion) {
+        $content = Get-Content -Path $pbxprojPath -Raw
+        $revertedContent = $content -replace "CURRENT_PROJECT_VERSION\s*=\s*$newVersionCode;", "CURRENT_PROJECT_VERSION = $oldIosVersion;"
+        [System.IO.File]::WriteAllText($pbxprojPath, $revertedContent)
+        Write-Host "Reverted iOS build number back to $oldIosVersion" -ForegroundColor Yellow
     }
 }
 
@@ -49,6 +63,7 @@ npx cap sync android
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Capacitor sync failed!"
+    Revert-Versions
     exit 1
 }
 
@@ -82,6 +97,7 @@ Write-Host "`n[3/3] Compiling Android App Bundle (AAB) for GMS..." -ForegroundCo
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Gradle build failed!"
+    Revert-Versions
     exit 1
 }
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid background color matching the app theme -->
+    <item android:drawable="@color/splash_bg" />
+    
+    <!-- Centered splash image preserving aspect ratio -->
+    <item>
+        <bitmap
+            android:src="@drawable/quran_potd_splash_9x16"
+            android:gravity="center"
+            android:tileMode="disabled" />
+    </item>
+</layer-list>
