@@ -56,7 +56,7 @@ const locales = {
         "themeSystem": "System",
         "settingsLanguage": "App Language",
         "settingsTranslationMode": "Translation Mode",
-        "translationModeTasreef": "Tasreef (Experimental)",
+        "translationModeTasreef": "Tasreef (Academic)",
         "translationModeDefault": "Default",
         "settingsArabicSize": "Arabic Text Size",
         "settingsTranslationSize": "Translation Text Size",
@@ -133,7 +133,7 @@ const locales = {
         "themeSystem": "Sistem",
         "settingsLanguage": "Bahasa Aplikasi",
         "settingsTranslationMode": "Mod Terjemahan",
-        "translationModeTasreef": "Tasreef (Eksperimen)",
+        "translationModeTasreef": "Tasreef (Akademik)",
         "translationModeDefault": "Biasa (Default)",
         "settingsArabicSize": "Saiz Teks Arab",
         "settingsTranslationSize": "Saiz Teks Terjemahan",
@@ -1140,7 +1140,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (aboutTermsLink) aboutTermsLink.innerText = strings.paywallTermsLink;
 
         const paywallSimulationLabel = document.getElementById("paywall-simulation-label");
-        if (paywallSimulationLabel) paywallSimulationLabel.innerText = strings.paywallSimulation;
+        if (paywallSimulationLabel) {
+            paywallSimulationLabel.innerText = strings.paywallSimulation;
+            if (IS_TESTING_MODE) {
+                paywallSimulationLabel.classList.remove("hidden");
+            } else {
+                paywallSimulationLabel.classList.add("hidden");
+            }
+        }
 
         // Bookmarks Modal
         const bookmarksModalTitle = document.getElementById("bookmarks-modal-title");
@@ -1302,6 +1309,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function showPaywall() {
         if (paywallModal) {
+            const paywallSimLabel = document.getElementById("paywall-simulation-label");
             if (!isCapacitor) {
                 // Adapt standard paywall modal to be a Download App promotion on Web
                 const paywallTitle = document.getElementById("paywall-title-label");
@@ -1313,7 +1321,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const paywallActions = paywallModal.querySelector(".paywall-actions");
                 const paywallTerms = document.getElementById("paywall-terms-label");
                 const paywallLinksContainer = document.getElementById("paywall-links-container");
-                const paywallSimLabel = document.getElementById("paywall-simulation-label");
                 if (paywallActions) paywallActions.classList.add("hidden");
                 if (paywallTerms) paywallTerms.classList.add("hidden");
                 if (paywallLinksContainer) paywallLinksContainer.classList.add("hidden");
@@ -1322,6 +1329,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // Show web promotional badges
                 const paywallWebPromo = document.getElementById("paywall-web-promo");
                 if (paywallWebPromo) paywallWebPromo.classList.remove("hidden");
+            } else {
+                // Native App environment
+                if (paywallSimLabel) {
+                    if (IS_TESTING_MODE) {
+                        paywallSimLabel.classList.remove("hidden");
+                    } else {
+                        paywallSimLabel.classList.add("hidden");
+                    }
+                }
             }
             paywallModal.classList.remove("hidden");
         }
