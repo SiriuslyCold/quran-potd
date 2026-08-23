@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quran PotD - Redirecting...</title>
+
+  <!-- Redirect script at the very top of head for fastest execution -->
+  <script>
+    (function () {
+      const urls = {
+        ios: "https://apps.apple.com/app/id6795434967",
+        android: "https://play.google.com/store/apps/details?id=com.mpv.quran_potd",
+        web: "https://quran-potd.web.app/"
+      };
+
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      let targetUrl = urls.web;
+
+      // Detect iOS (iPhone, iPad, iPod) + iPadOS on modern Safari
+      const isIOS = /iPad|iPhone|iPod/.test(userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      // Detect Android
+      const isAndroid = /android/i.test(userAgent);
+
+      if (isIOS) {
+        targetUrl = urls.ios;
+      } else if (isAndroid) {
+        targetUrl = urls.android;
+      }
+
+      // Execute redirection
+      window.location.replace(targetUrl);
+    })();
+  </script>
+
+  <!-- Fonts & Main Site CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="main.css?v=1.6.2">
+
+  <style>
+    :root {
+      /* Map local variables to site theme variables, with standard fallback values */
+      --bg: var(--bg-color, #020617);
+      --card-bg: var(--card-bg, rgba(15, 23, 42, 0.55));
+      --text-main: var(--text-main, #f8fafc);
+      --text-muted: var(--text-muted, #94a3b8);
+      --accent: var(--accent, #34d399);
+      --accent-hover: var(--gold, #f59e0b);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: var(--body-bg-gradient, radial-gradient(ellipse at top, #022c22 0%, #020617 80%));
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border, rgba(255, 255, 255, 0.08));
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 0.8s ease-in-out infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: block;
+      padding: 0.85rem 1.25rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border, rgba(255, 255, 255, 0.08));
+      color: var(--text-main);
+    }
+
+    .btn:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1.5px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, #0f766e 100%);
+      color: var(--accent-contrast, #020617);
+      border: none;
+      box-shadow: 0 4px 12px rgba(52, 211, 153, 0.2);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--accent) 0%, #115e59 100%);
+      box-shadow: 0 6px 18px rgba(52, 211, 153, 0.35);
+      color: var(--accent-contrast, #020617);
+    }
+  </style>
+
+  <!-- Open Graph Meta Tags -->
+  <meta id="og:type" property="og:type" content="website" />
+  <meta id="og:title" property="og:title" content="Qur'an Passage of the Day" />
+  <meta id="og:url" property="og:url" content="https://quran-potd.web.app/" />
+  <meta id="og:description" property="og:description"
+    content="Explore daily linguistic breakdowns, morphological analysis, and clear contextual overviews of the Qur'an." />
+  <meta id="og:image" property="og:image" content="https://quran-potd.web.app/img/quran-potd-social.jpg" />
+
+  <!-- Twitter Card Meta Tags -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://quran-potd.web.app/">
+  <meta property="twitter:title" content="Qur'an Passage of the Day" />
+  <meta property="twitter:description"
+    content="Explore daily linguistic breakdowns, morphological analysis, and clear contextual overviews of the Qur'an." />
+  <meta property="twitter:image" content="https://quran-potd.web.app/img/quran-potd-social.jpg" />
+
+</head>
+
+<body>
+
+  <main class="container">
+    <div class="spinner"></div>
+    <h1>Quran POTD</h1>
+    <p>Redirecting you to the right store or app version...</p>
+
+    <div class="links-list">
+      <a class="btn btn-primary" href="https://apps.apple.com/app/id6795434967">Download on App Store</a>
+      <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.mpv.quran_potd">Get it on
+        Google Play</a>
+      <a class="btn" href="https://quran-potd.web.app/">Continue to Web App</a>
+    </div>
+  </main>
+
+</body>
+
+</html>

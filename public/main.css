@@ -362,7 +362,7 @@ h1 {
     font-size: var(--arabic-font-size);
     direction: rtl;
     text-align: right;
-    line-height: 2.2rem;
+    line-height: 2.4;
     margin-top: 0;
     margin-bottom: 0.6rem;
     color: var(--arabic-color);

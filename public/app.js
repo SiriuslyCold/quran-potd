@@ -2102,6 +2102,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ? "appl_puVnUAMslLndYXRpNNqygcmWyzd"
                             : "goog_fucCDqVdLJYzzgZIuccubFtEgvv";
 
+                        if (typeof Purchases.setLogLevel === 'function') {
+                            await Purchases.setLogLevel({ level: "DEBUG" });
+                        }
                         await Purchases.configure({ apiKey: apiKey });
                         console.log("[DEBUG CLIENT] RevenueCat configured.");
 
@@ -2230,7 +2233,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 updateNowBtn.onclick = async () => {
                     const isIos = window.Capacitor.getPlatform() === 'ios';
                     const storeUrl = isIos 
-                        ? (data.url.ios || "https://apps.apple.com/app/your-app-id") 
+                        ? (data.url.ios || "https://apps.apple.com/app/id6795434967") 
                         : (data.url.android || "https://play.google.com/store/apps/details?id=com.mpv.quran_potd");
                     window.open(storeUrl, "_system");
                 };
