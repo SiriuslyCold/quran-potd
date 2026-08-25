@@ -41,7 +41,7 @@ let activeAudioButton = null; // Currently playing verse button DOM reference
 
 const OG_DESCRIPTION = "Explore daily linguistic breakdowns, morphological analysis, and clear contextual overviews of the Qur'an.";
 const OG_IMAGE = "https://quran-potd.web.app/quran-potd-social.jpg";
-const APP_VERSION = "1.6.2";
+const APP_VERSION = "1.6.3";
 
 const SURAH_NAMES = [
     "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
