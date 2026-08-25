@@ -43,6 +43,21 @@ const OG_DESCRIPTION = "Explore daily linguistic breakdowns, morphological analy
 const OG_IMAGE = "https://quran-potd.web.app/quran-potd-social.jpg";
 const APP_VERSION = "1.6.2";
 
+const SURAH_NAMES = [
+    "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
+    "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra'", "Al-Kahf", "Maryam", "Ta-Ha",
+    "Al-Anbiya'", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Asy-Syu'ara'", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum",
+    "Luqman", "As-Sajdah", "Al-Ahzab", "Saba'", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir",
+    "Fussilat", "Asy-Syura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
+    "Adz-Dzariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hashr", "Al-Mumtahanah",
+    "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij",
+    "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba'", "An-Nazi'at", "'Abasa",
+    "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghashiyah", "Al-Fajr", "Al-Balad",
+    "Asy-Syams", "Al-Layl", "Ad-Duha", "Al-Insyirah", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Al-Zalzalah", "Al-'Adiyat",
+    "Al-Qari'ah", "At-Takathur", "Al-'Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kauthar", "Al-Kafirun", "An-Nasr",
+    "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+];
+
 const locales = {
     "en": {
         "appTitle": "Qur'an Passage of the Day",
@@ -442,6 +457,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchResultsList = document.getElementById("search-results-list");
     let localSearchIndex = [];
 
+    // Concordance Elements
+    const concordanceModal = document.getElementById("concordance-modal");
+    const concordanceCloseBtn = document.getElementById("concordance-close-btn");
+    const concordanceResultsList = document.getElementById("concordance-results-list");
+    const concordanceLoading = document.getElementById("concordance-loading");
+    const concordanceError = document.getElementById("concordance-error");
+    const concordanceErrorMsg = document.getElementById("concordance-error-msg");
+    const concordanceModalTitle = document.getElementById("concordance-modal-title");
+    const concordanceWordInfo = document.getElementById("concordance-word-info");
+
     // Set default metadata tags
     updateMetadata(OG_DESCRIPTION, OG_IMAGE);
 
@@ -778,6 +803,128 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    async function showConcordance(item) {
+        if (!item || !item.root) return;
+        const cleanRoot = item.root.trim();
+
+        concordanceModalTitle.innerText = `Occurrences of Root: ${cleanRoot}`;
+        concordanceModal.classList.remove("hidden");
+        concordanceLoading.classList.remove("hidden");
+        concordanceResultsList.innerHTML = "";
+        concordanceError.classList.add("hidden");
+        concordanceWordInfo.classList.add("hidden");
+
+        try {
+            let wordArabic = item.word;
+            let wordTranslit = "";
+            const translitMatch = item.word.match(/^(.*?)\s*\((.*?)\)$/);
+            if (translitMatch) {
+                wordArabic = translitMatch[1].trim();
+                wordTranslit = translitMatch[2].trim();
+            }
+
+            let meaningHtml = "";
+            const breakdown = item.morphology_breakdown || "";
+            if (breakdown.includes("\n")) {
+                const parts = breakdown.split(/\n+/).map(p => p.trim()).filter(Boolean);
+                if (parts.length >= 2) {
+                    meaningHtml = parts.slice(1).join("<br>");
+                } else {
+                    meaningHtml = breakdown;
+                }
+            } else {
+                const match = breakdown.match(/(.*)\s*(?:,|\.)\s*(meaning|denoting|signifies|indicates|signifying|refers to|denotes)\s+(.*)/i);
+                if (match) {
+                    meaningHtml = `${match[2].trim().charAt(0).toUpperCase() + match[2].trim().slice(1)} ${match[3].trim()}`;
+                } else {
+                    meaningHtml = breakdown;
+                }
+            }
+
+            concordanceWordInfo.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 700; color: var(--accent);">Target Word:</span>
+                    <span style="font-family: 'Amiri', serif; font-size: 1.2rem; color: var(--tasreef-word-color); direction: rtl; text-align: right;">
+                        ${wordArabic} ${wordTranslit ? `<span style="font-size: 0.8rem; font-family: inherit; color: var(--text-muted);">(${wordTranslit})</span>` : ""}
+                    </span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 700; color: var(--accent);">Wazn / Root:</span>
+                    <span style="color: var(--text-main);">${item.wazn} (Root: <strong style="color: var(--gold);">${item.root}</strong>)</span>
+                </div>
+                ${meaningHtml ? `
+                <div style="border-top: 1px dashed var(--card-border); padding-top: 0.5rem; margin-top: 0.5rem; color: var(--text-muted); line-height: 1.25rem;">
+                    ${meaningHtml}
+                </div>` : ""}
+            `;
+            concordanceWordInfo.classList.remove("hidden");
+        } catch (parseErr) {
+            console.error("Failed to parse clicked word info:", parseErr);
+        }
+
+        try {
+            const url = `https://concordance-api-qlnayz4vaq-uc.a.run.app/concordance_api?root=${encodeURIComponent(cleanRoot)}&limit=5`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Server returned status ${response.status}`);
+            }
+            const data = await response.json();
+            concordanceLoading.classList.add("hidden");
+
+            if (!data.instances || data.instances.length === 0) {
+                concordanceResultsList.innerHTML = `<p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); padding: 2rem; margin: 0;">No occurrences found for this root.</p>`;
+                return;
+            }
+
+            data.instances.forEach(inst => {
+                const item = document.createElement("div");
+                item.style.borderBottom = "1px solid var(--card-border)";
+                item.style.padding = "1rem 0";
+
+                let arabicHtml = inst.snippet || inst.uthmanic_rasm || "";
+                if (inst.uthmanic_rasm && arabicHtml.includes(inst.uthmanic_rasm)) {
+                    arabicHtml = arabicHtml.replace(
+                        inst.uthmanic_rasm,
+                        `<span style="color: var(--gold); font-weight: 700; border-bottom: 1.5px solid var(--gold); padding-bottom: 1px;">${inst.uthmanic_rasm}</span>`
+                    );
+                } else if (inst.bare_rasm && arabicHtml.includes(inst.bare_rasm)) {
+                    arabicHtml = arabicHtml.replace(
+                        inst.bare_rasm,
+                        `<span style="color: var(--gold); font-weight: 700; border-bottom: 1.5px solid var(--gold); padding-bottom: 1px;">${inst.bare_rasm}</span>`
+                    );
+                }
+
+                let translationHtml = inst.translation || "";
+                if (translationHtml) {
+                    translationHtml = translationHtml.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--gold); font-weight: 700;">$1</strong>');
+                }
+
+                const surahName = SURAH_NAMES[inst.surah - 1] || `Surah ${inst.surah}`;
+                const waznInfo = (inst.wazn && inst.wazn.category) ? ` • ${inst.wazn.category}` : "";
+
+                item.innerHTML = `
+                    <div style="font-family: 'Amiri', serif; font-size: 1.3rem; margin-bottom: 0.5rem; line-height: 2.2rem; direction: rtl; text-align: right; color: var(--text-main);">
+                        ${arabicHtml}
+                    </div>
+                    ${translationHtml ? `
+                    <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left; line-height: 1.3rem; margin-bottom: 0.5rem; direction: ltr;">
+                        ${translationHtml}
+                    </div>` : ''}
+                    <div style="font-size: 0.75rem; color: var(--gold); text-align: left; direction: ltr; font-weight: 600;">
+                        ${surahName} ${inst.surah}:${inst.ayah}${waznInfo}
+                    </div>
+                `;
+                concordanceResultsList.appendChild(item);
+            });
+
+        } catch (err) {
+            console.error("Concordance Fetch Error:", err);
+            concordanceLoading.classList.add("hidden");
+            concordanceError.classList.remove("hidden");
+            concordanceErrorMsg.innerText = `Failed to load occurrences: ${err.message}`;
+        }
+    }
+
     function renderPassage(data) {
         const { meta, translations, overview, tasreef } = data;
 
@@ -896,6 +1043,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
                 ${morphologyDescHtml}
             `;
+            card.onclick = () => {
+                if (card.classList.contains("premium-locked")) {
+                    showPaywall();
+                    return;
+                }
+                logAnalyticsEvent('concordance_card_click', { root: item.root, word: item.word });
+                showConcordance(item);
+            };
+
             tasreefContainer.appendChild(card);
         });
 
@@ -1349,12 +1505,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
     }
 
+    if (concordanceCloseBtn) {
+        concordanceCloseBtn.onclick = () => {
+            logAnalyticsEvent('concordance_close_click');
+            concordanceModal.classList.add("hidden");
+        };
+    }
+
     window.addEventListener("click", (e) => {
         if (e.target === aboutModal) aboutModal.classList.add("hidden");
         if (e.target === paywallModal) paywallModal.classList.add("hidden");
         if (e.target === bookmarksModal) bookmarksModal.classList.add("hidden");
         if (e.target === searchModal) searchModal.classList.add("hidden");
         if (e.target === shareModal) shareModal.classList.add("hidden");
+        if (e.target === concordanceModal) concordanceModal.classList.add("hidden");
     });
 
     window.addEventListener("keydown", (e) => {
@@ -1364,6 +1528,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (bookmarksModal) bookmarksModal.classList.add("hidden");
             if (searchModal) searchModal.classList.add("hidden");
             if (shareModal) shareModal.classList.add("hidden");
+            if (concordanceModal) concordanceModal.classList.add("hidden");
         }
     });
 

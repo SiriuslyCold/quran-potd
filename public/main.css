@@ -478,6 +478,7 @@ h1 {
     border: 1px solid var(--tasreef-card-border);
     border-radius: 12px;
     padding: 1rem 1.2rem;
+    cursor: pointer;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

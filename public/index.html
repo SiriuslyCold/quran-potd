@@ -504,7 +504,7 @@
                 style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.6rem;">
                 <i class="fa-solid fa-share-nodes" style="color: var(--gold); font-size: 1.2rem;"></i>
                 <h4 id="share-modal-title"
-                    style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.1rem;">Share Passage</h4>
+                    style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.1rem; border-bottom: none; padding-bottom: 0;">Share Passage</h4>
             </div>
 
             <div class="modal-body share-modal-body">
@@ -524,6 +524,34 @@
                         <i class="fa-solid fa-share-nodes"></i> <span id="share-native-btn-label">Share via
                             Device...</span>
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Glassmorphic Concordance Modal -->
+    <div id="concordance-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-card concordance-modal-card" style="max-width: 500px; width: 90%; max-height: 90vh;">
+            <span id="concordance-close-btn" class="close-btn">&times;</span>
+            <div class="concordance-modal-header" style="margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.6rem;">
+                <h4 style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: none; padding-bottom: 0;">
+                    <i class="fa-solid fa-book" style="color: var(--gold); font-size: 1.2rem;"></i>
+                    <span id="concordance-modal-title">Root Occurrences</span>
+                </h4>
+            </div>
+
+            <div class="modal-body concordance-modal-body" style="max-height: 75vh; overflow-y: auto; padding-right: 0.4rem;">
+                <div id="concordance-word-info" class="hidden" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 1rem; font-size: 0.85rem;"></div>
+                <div id="concordance-loading" class="hidden" style="text-align: center; padding: 2rem;">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Fetching concordance...</p>
+                </div>
+                <div id="concordance-error" class="hidden" style="text-align: center; padding: 2rem; color: #f43f5e;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p id="concordance-error-msg" style="font-size: 0.85rem; margin: 0;"></p>
+                </div>
+                <div id="concordance-results-list" class="bookmarks-list">
+                    <!-- Concordance instances populated dynamically -->
                 </div>
             </div>
         </div>
