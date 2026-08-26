@@ -804,10 +804,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function showConcordance(item) {
-        if (!item || !item.root) return;
-        const cleanRoot = item.root.trim();
+        console.log("[DEBUG CONCORDANCE] showConcordance called with item:", item);
+        if (!item || !item.root) {
+            console.warn("[DEBUG CONCORDANCE] showConcordance received invalid or empty item.");
+            return;
+        }
+        let cleanRoot = item.root.trim();
+        const match = cleanRoot.match(/\(([^)]+)\)/);
+        if (match) {
+            cleanRoot = match[1].trim();
+        }
+        console.log("[DEBUG CONCORDANCE] Extracted cleanRoot for API:", cleanRoot);
 
-        concordanceModalTitle.innerText = `Occurrences of Root: ${cleanRoot}`;
+        concordanceModalTitle.innerText = `Occurrences of Root: ${item.root.trim()}`;
         concordanceModal.classList.remove("hidden");
         concordanceLoading.classList.remove("hidden");
         concordanceResultsList.innerHTML = "";
@@ -864,14 +873,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         try {
             const url = `https://concordance-api-qlnayz4vaq-uc.a.run.app/concordance_api?root=${encodeURIComponent(cleanRoot)}&limit=5`;
+            console.log("[DEBUG CONCORDANCE] Fetching from URL:", url);
             const response = await fetch(url);
+            console.log("[DEBUG CONCORDANCE] Response received. Status:", response.status, "OK:", response.ok);
             if (!response.ok) {
                 throw new Error(`Server returned status ${response.status}`);
             }
             const data = await response.json();
+            console.log("[DEBUG CONCORDANCE] Successfully parsed response data:", data);
             concordanceLoading.classList.add("hidden");
 
             if (!data.instances || data.instances.length === 0) {
+                console.log("[DEBUG CONCORDANCE] No concordance instances found for root:", cleanRoot);
                 concordanceResultsList.innerHTML = `<p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); padding: 2rem; margin: 0;">No occurrences found for this root.</p>`;
                 return;
             }
@@ -918,7 +931,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
 
         } catch (err) {
-            console.error("Concordance Fetch Error:", err);
+            console.error("[DEBUG CONCORDANCE] Concordance Fetch Error:", err);
             concordanceLoading.classList.add("hidden");
             concordanceError.classList.remove("hidden");
             concordanceErrorMsg.innerText = `Failed to load occurrences: ${err.message}`;
