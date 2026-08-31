@@ -324,6 +324,10 @@ h1 {
     margin-bottom: 1.25rem;
     position: relative;
     overflow: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .meta-title {
@@ -335,6 +339,8 @@ h1 {
     margin-top: 0;
     margin-bottom: 1.2rem;
     letter-spacing: -0.01em;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 /* Quranic Verses Layout */
@@ -912,7 +918,13 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.paywall-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
 }
 
 .paywall-icon-container {
@@ -974,63 +986,145 @@ h1 {
 .paywall-actions {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.7rem;
     margin-bottom: 1rem;
 }
 
-.paywall-primary-btn {
-    background: linear-gradient(135deg, var(--accent) 0%, #0f766e 100%);
-    color: var(--accent-contrast);
-    font-weight: 700;
-    padding: 0.85rem 1.5rem;
-    border-radius: 25px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.95rem;
+.paywall-plan-btn {
     width: 100%;
-    box-shadow: 0 4px 12px rgba(52, 211, 153, 0.2);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    text-align: center;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    box-sizing: border-box;
+    font-family: inherit;
 }
 
-body.theme-light .paywall-primary-btn {
-    background: linear-gradient(135deg, var(--accent) 0%, #0d9488 100%);
-    color: #ffffff;
+.paywall-plan-yearly {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.14) 0%, rgba(16, 185, 129, 0.14) 100%);
+    border: 1.5px solid var(--gold);
+    color: var(--text-main);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
 }
 
-.paywall-primary-btn:hover {
+body.theme-light .paywall-plan-yearly {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(16, 185, 129, 0.18) 100%);
+    border: 1.5px solid #d97706;
+}
+
+.paywall-plan-yearly:hover {
     transform: translateY(-1.5px);
-    box-shadow: 0 6px 18px rgba(52, 211, 153, 0.35);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.24) 0%, rgba(16, 185, 129, 0.22) 100%);
 }
 
-.paywall-primary-btn:active {
+.paywall-plan-yearly:active, .paywall-plan-monthly:active {
     transform: translateY(0);
 }
 
-.paywall-secondary-btn {
-    background: transparent;
+.paywall-plan-monthly {
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--card-border);
-    color: var(--text-muted);
-    font-weight: 600;
-    padding: 0.65rem 1.5rem;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    width: 100%;
-    transition: all 0.2s ease;
+    color: var(--text-main);
 }
 
-.paywall-secondary-btn:hover {
+body.theme-light .paywall-plan-monthly {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.paywall-plan-monthly:hover {
     background: var(--accent-light);
-    color: var(--accent);
     border-color: var(--accent);
+    transform: translateY(-1.5px);
+}
+
+.paywall-plan-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.paywall-plan-price {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: -0.01em;
+}
+
+body.theme-light .paywall-plan-price {
+    color: #92400e;
+}
+
+.paywall-plan-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.paywall-restore-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0.3rem;
+    margin-top: 0.2rem;
+    align-self: center;
+    transition: color 0.2s ease;
+}
+
+.paywall-restore-btn:hover {
+    color: var(--gold);
 }
 
 .paywall-terms {
-    font-size: 0.7rem !important;
+    font-size: 0.74rem !important;
     color: var(--text-muted) !important;
-    opacity: 0.7;
-    margin: 0 !important;
-    line-height: 1.3 !important;
+    opacity: 0.95;
+    margin: 0.6rem 0 !important;
+    line-height: 1.35 !important;
+    text-align: center;
+}
+
+.paywall-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.9rem;
+    font-size: 0.78rem;
+    width: 100%;
+}
+
+.paywall-link {
+    color: var(--gold);
+    text-decoration: underline;
+    font-weight: 500;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    background: rgba(212, 175, 55, 0.08);
+    transition: all 0.2s ease;
+}
+
+.paywall-link:hover {
+    background: rgba(212, 175, 55, 0.18);
+    color: var(--text-main);
+}
+
+.paywall-link-sep {
+    color: var(--text-muted);
+    opacity: 0.5;
 }
 
 /* Save Yearly Subscription Badge styling */
@@ -1041,7 +1135,6 @@ body.theme-light .paywall-primary-btn {
     font-weight: 850;
     padding: 0.1rem 0.45rem;
     border-radius: 8px;
-    margin-top: 0.25rem;
     display: inline-block;
     text-transform: uppercase;
     letter-spacing: 0.05em;

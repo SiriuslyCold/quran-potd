@@ -67,22 +67,13 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-Write-Host "Resolving symbolic links for Windows Gradle compatibility..." -ForegroundColor Yellow
-$topLevelItems = Get-ChildItem -Path "$projectDir\android\app\src\main\assets\public"
-foreach ($item in $topLevelItems) {
-    if ($item.Name -eq "cordova.js" -or $item.Name -eq "cordova_plugins.js") {
-        continue
-    }
-    if ($item.Attributes -match 'ReparsePoint') {
-        $destPath = $item.FullName
-        $srcPath = "$projectDir\public\$($item.Name)"
-        if (Test-Path $srcPath) {
-            Remove-Item -Path $destPath -Force -Recurse
-            Copy-Item -Path $srcPath -Destination $destPath -Recurse -Force
-            Write-Host "Replaced symlink: $($item.Name) with actual copy" -ForegroundColor Gray
-        }
-    }
+Write-Host "Resolving assets for Windows Gradle compatibility..." -ForegroundColor Yellow
+$publicAssetsDir = "$projectDir\android\app\src\main\assets\public"
+if (Test-Path $publicAssetsDir) {
+    Remove-Item -Path $publicAssetsDir -Force -Recurse -ErrorAction SilentlyContinue
 }
+New-Item -ItemType Directory -Path $publicAssetsDir -Force | Out-Null
+Copy-Item -Path "$projectDir\public\*" -Destination $publicAssetsDir -Recurse -Force
 
 Remove-Item -Path "$projectDir\android\app\src\main\assets\public\cordova.js" -Force -ErrorAction SilentlyContinue
 Copy-Item -Path "$projectDir\node_modules\@capacitor\core\cordova.js" -Destination "$projectDir\android\app\src\main\assets\public\cordova.js"

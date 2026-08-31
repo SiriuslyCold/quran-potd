@@ -227,7 +227,7 @@
                 <!-- Tab 3: Tasreef View -->
                 <section id="pane-tasreef" class="content-pane">
                     <div class="card glass-card">
-                        <div class="meta-title" id="tasreef-heading-label">Key Target Word Tasreef (Morphology)</div>
+                        <div class="meta-title" id="tasreef-heading-label">Key Morphological Analysis (Tasreef)</div>
                         <div id="tasreef-container" class="tasreef-grid"></div>
                     </div>
                 </section>
@@ -341,17 +341,54 @@
                 <div class="paywall-icon-container">
                     <i class="fa-solid fa-calendar-check paywall-icon"></i>
                 </div>
-                <h4 id="paywall-title-label">Unlock the Archive</h4>
+                <h4 id="paywall-title-label">Subscribe to Premium</h4>
             </div>
 
             <div class="modal-body paywall-body">
-                <p id="paywall-description-label">Accessing historical days and reviewing previous passages is a premium
-                    archive feature.</p>
+                <div class="paywall-actions">
+                    <button id="paywall-subscribe-yearly-btn" class="paywall-plan-btn paywall-plan-yearly" type="button">
+                        <div class="paywall-plan-header">
+                            <span class="paywall-plan-price" id="paywall-yearly-btn-price">$19.99 / year</span>
+                            <span class="paywall-save-badge" id="paywall-save-badge-label">Save 16%</span>
+                        </div>
+                        <div class="paywall-plan-sub" id="paywall-yearly-btn-sub">
+                            Includes 7-day free trial • Cancel anytime
+                        </div>
+                    </button>
 
+                    <button id="paywall-subscribe-monthly-btn" class="paywall-plan-btn paywall-plan-monthly" type="button">
+                        <div class="paywall-plan-header">
+                            <span class="paywall-plan-price" id="paywall-monthly-btn-price">$1.99 / month</span>
+                        </div>
+                        <div class="paywall-plan-sub" id="paywall-monthly-btn-sub">
+                            Billed monthly • Cancel anytime
+                        </div>
+                    </button>
+
+                    <button id="paywall-restore-btn" class="paywall-restore-btn" type="button">
+                        <span id="paywall-restore-btn-label">Restore Purchases</span>
+                    </button>
+                </div>
+
+                <p class="paywall-terms" id="paywall-terms-label">
+                    Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. Subscriptions may be managed or cancelled in your Account Settings after purchase. Any unused portion of a free trial period, if offered, will be forfeited when purchasing a subscription.
+                </p>
+
+                <div class="paywall-links" id="paywall-links-container">
+                    <a href="privacy.html" id="paywall-privacy-link" class="paywall-link">Privacy Policy</a>
+                    <span class="paywall-link-sep">|</span>
+                    <a href="terms.html" id="paywall-terms-link" class="paywall-link">Terms of Use</a>
+                </div>
+
+                <p class="paywall-simulation-note hidden" id="paywall-simulation-label">
+                    ℹ️ Simulation Mode: Purchases are simulated for evaluation purposes. No real money is charged.
+                </p>
+
+                <!-- Premium Features Checklist -->
                 <div class="paywall-features">
                     <div class="paywall-feature-row">
                         <i class="fa-solid fa-circle-check paywall-check"></i>
-                        <span id="paywall-feat-nav">Unlimited historical day navigation</span>
+                        <span id="paywall-feat-nav">Navigate previous passages</span>
                     </div>
                     <div class="paywall-feature-row">
                         <i class="fa-solid fa-circle-check paywall-check"></i>
@@ -390,43 +427,6 @@
                         </a>
                     </div>
                 </div>
-
-                <div class="paywall-actions">
-                    <button id="paywall-trial-btn" class="paywall-primary-btn"
-                        style="background: var(--gold) !important; color: var(--bg-main) !important; font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(212,175,55,0.3); padding: 0.9rem; border-radius: 8px;">
-                        <span id="paywall-trial-btn-title">Start 7-Day Free Trial</span>
-                        <br>
-                        <span id="paywall-trial-btn-sub"
-                            style="font-size: 0.75rem; opacity: 0.9; font-weight: 500;">Then $19.99/year. Cancel
-                            anytime.</span>
-                    </button>
-
-                    <button id="paywall-subscribe-monthly-btn" class="paywall-secondary-btn"
-                        style="margin-top: 0.6rem; width: 100%; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: var(--text-main);">
-                        <span id="paywall-monthly-btn-label">Subscribe Monthly - $1.99 / mo</span>
-                    </button>
-                    <button id="paywall-subscribe-yearly-btn" class="paywall-secondary-btn"
-                        style="margin-top: 0.6rem; width: 100%; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: var(--text-main);">
-                        <span id="paywall-yearly-btn-label">Subscribe Yearly - $19.99 / yr</span>
-                        <br>
-                        <span class="paywall-save-badge" id="paywall-save-badge-label">Save 16%</span>
-                    </button>
-                    <button id="paywall-restore-btn" class="paywall-secondary-btn"
-                        style="margin-top: 0.8rem; border: none; background: transparent; color: var(--text-muted); font-size: 0.85rem; text-decoration: underline; width: auto; align-self: center;">
-                        <span id="paywall-restore-btn-label">Restore Purchases</span>
-                    </button>
-                </div>
-                <p class="paywall-terms" id="paywall-terms-label" style="margin-bottom: 0.8rem;">Charges applied to
-                    Apple App Store / Google Play account. Cancel anytime via device settings.</p>
-                <div class="paywall-links" id="paywall-links-container" style="display: flex; justify-content: center; gap: 1rem; margin-top: 0.2rem; margin-bottom: 0.8rem; font-size: 0.75rem; width: 100%;">
-                    <a href="privacy.html" id="paywall-privacy-link" style="color: var(--gold); text-decoration: underline;">Privacy Policy</a>
-                    <span style="color: var(--text-muted);">|</span>
-                    <a href="terms.html" id="paywall-terms-link" style="color: var(--gold); text-decoration: underline;">Terms of Use</a>
-                </div>
-                <p class="paywall-simulation-note hidden" id="paywall-simulation-label"
-                    style="font-size: 0.8rem; color: var(--gold); text-align: center; border: 1px dashed rgba(212,175,55,0.5); padding: 0.6rem; border-radius: 6px; background: rgba(212,175,55,0.05); margin: 0 0.5rem 0.5rem 0.5rem; line-height: 1.2rem;">
-                    ℹ️ Simulation Mode: Purchases are simulated for evaluation purposes. No real money is charged.
-                </p>
             </div>
         </div>
     </div>

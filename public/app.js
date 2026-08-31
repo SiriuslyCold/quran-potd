@@ -41,7 +41,7 @@ let activeAudioButton = null; // Currently playing verse button DOM reference
 
 const OG_DESCRIPTION = "Explore daily linguistic breakdowns, morphological analysis, and clear contextual overviews of the Qur'an.";
 const OG_IMAGE = "https://quran-potd.web.app/quran-potd-social.jpg";
-const APP_VERSION = "1.6.3";
+const APP_VERSION = "1.6.4";
 
 const SURAH_NAMES = [
     "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
@@ -60,14 +60,33 @@ const SURAH_NAMES = [
 
 const locales = {
     "en": {
+        "tagline": "Powered by MPV",
         "appTitle": "Qur'an Passage of the Day",
         "dateLocale": "en-GB",
+        "todayTab": "Today",
+        "archiveTab": "Archive",
+        "bookmarksTab": "Bookmarks",
+        "searchTab": "Search",
+        "settingsTab": "Settings",
+        "aboutTab": "About",
+        "historicalPassage": "Historical Passage",
+        "historicalNote": "You are viewing a historical passage from the Qur'an PoTD archive.",
+        "btnReturnToday": "Return to Today",
+        "btnBackToToday": "Back to Today's Passage",
+        "btnCopy": "Copy",
+        "btnShare": "Share",
+        "btnListen": "Listen",
+        "btnBookmark": "Bookmark",
+        "btnNext": "Next",
+        "btnPrevious": "Previous",
         "sectionOverview": "Thematic Overview",
         "sectionTasreef": "Key Morphological Analysis (Tasreef)",
         "settingsTitle": "Display Settings",
         "settingsTheme": "App Theme",
+        "themeAuto": "System",
         "themeLight": "Light",
         "themeDark": "Dark",
+        "themeSepia": "Sepia",
         "themeSystem": "System",
         "settingsLanguage": "App Language",
         "settingsTranslationMode": "Translation Mode",
@@ -83,22 +102,22 @@ const locales = {
         "searchPlaceholder": "Search keywords, roots, topics...",
         "searchEmpty": "Enter a keyword, topic, or Arabic root to search.",
         "searchNoResults": "No matching passages found. Try checking spelling or different terms.",
-        "paywallTitle": "Unlock the Archive",
-        "paywallDescription": "Accessing historical days and reviewing previous passages is a premium archive feature.",
-        "paywallFeatNav": "Unlimited historical day navigation",
+        "paywallTitle": "Subscribe to Premium",
+        "paywallDescription": "Accessing previous passages, search, and bookmarking are premium features.",
+        "paywallFeatNav": "Navigate previous passages",
         "paywallFeatBookmarks": "Bookmark passages",
         "paywallFeatSearch": "Search archive for keyword",
         "paywallFeatRecital": "Audio recital",
         "paywallFeatSupport": "Support progressive values & content development",
-        "paywallTrialTitle": "Start 7-Day Free Trial",
-        "paywallTrialSub": "Then $19.99/year. Cancel anytime.",
-        "paywallMonthly": "Subscribe Monthly - $1.99 / mo",
-        "paywallYearly": "Subscribe Yearly - $19.99 / yr",
+        "paywallYearlyPrice": "$19.99 / year",
+        "paywallYearlySub": "Includes 7-day free trial • Cancel anytime",
+        "paywallMonthlyPrice": "$1.99 / month",
+        "paywallMonthlySub": "Billed monthly • Cancel anytime",
         "paywallSave": "Save 16%",
         "paywallRestore": "Restore Purchases",
         "paywallPrivacy": "Privacy Policy",
         "paywallTermsLink": "Terms of Use",
-        "paywallTerms": "Payment will be charged to your iTunes/Google Play account at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period. Your account will be charged for renewal within 24-hours prior to the end of the current period. Subscriptions may be managed by the user and auto-renewal may be turned off by going to Account Settings after purchase. Any unused portion of a free trial period, if offered, will be forfeited when you purchase a subscription.",
+        "paywallTerms": "Payment will be charged to your Apple ID / Google Play account at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. Subscriptions may be managed or cancelled in your Account Settings after purchase. Any unused portion of a free trial period, if offered, will be forfeited when purchasing a subscription.",
         "paywallSimulation": "ℹ️ Simulation Mode: Purchases are simulated for evaluation purposes. No real money is charged.",
         "updateTitle": "Update Available",
         "updateDescOptional": "A new version of Qur'an Passage of the Day is available. Please update to enjoy the latest features and enhancements.",
@@ -109,14 +128,30 @@ const locales = {
         "loaderText": "Retrieving passage...",
         "toastBookmarkAdded": "✅ Passage bookmarked!",
         "toastBookmarkRemoved": "❌ Bookmark removed!",
+        "toastMaxBookmarks": "Maximum of 50 bookmarks reached",
+        "toastSearchEmpty": "Please enter a search query",
+        "toastCopySuccess": "Passage copied to clipboard!",
+        "toastCopyFail": "Failed to copy passage",
+        "toastNativeShareFail": "Sharing failed: ",
+        "toastAudioError": "Failed to play audio recital.",
+        "toastAudioUnsupported": "Audio format is not supported on this device.",
+        "toastAudioNotFound": "Recital audio file could not be found.",
+        "toastAudioBlocked": "Audio playback blocked. Please interact with the page first.",
+        "toastAudioNetwork": "Network error while loading recital audio.",
         "toastOffline": "📶 Showing offline cached passage",
         "toastConnectionError": "Unable to retrieve today's passage. Please check your network connection and try again.",
         "toastRetry": "Retry",
         "toastCopied": "✅ Passage copied to clipboard!",
         "toastSimulatedUnlock": "Simulated Monthly Subscription Active! Unlocked (active for 5 mins).",
+        "toastSimulatedPurchased": "Simulated purchase successful! Premium archive unlocked.",
         "toastSimulatedRestore": "Simulated purchases restored!",
+        "toastSimulatedActive": "You already have active simulated premium archive access.",
         "toastPurchaseFailed": "Purchase cancelled or failed.",
         "toastPremiumUnlocked": "Subscription Active! Premium access unlocked.",
+        "toastSubActive": "Subscription Active! Premium access unlocked.",
+        "toastSyncSuccess": "Archive synchronised successfully.",
+        "toastSyncFail": "Sync failed: ",
+        "toastAppUpToDate": "App is up to date.",
         "tooltipSettings": "Display & Theme Settings",
         "tooltipAbout": "About This Project",
         "tooltipShare": "Share Passage",
@@ -131,51 +166,55 @@ const locales = {
         "shareTextVerses": "Verses",
         "shareTextLink": "🔗 View keyword linguistic breakdown and recitations:",
         "subStatusFree": "You are currently on the Free plan.",
-        "subStatusSubscribed": "You're currently subscribed to the {plan} plan. Manage your subscription on the Google Play/AppStore (depending on device).",
+        "subStatusSubscribed": "You're currently subscribed to the {plan} plan. Manage your subscription on Google Play/App Store (depending on device).",
         "planMonthly": "monthly",
         "planYearly": "yearly",
         "planPremium": "premium"
     },
     "ms": {
-        "appTitle": "Ayat Al-Qur'an Pilihan Harian",
-        "dateLocale": "ms",
-        "sectionOverview": "Gambaran Tematik",
-        "sectionTasreef": "Analisis Morfologi Utama (Tasreef)",
-        "settingsTitle": "Tetapan Paparan",
-        "settingsTheme": "Tema Aplikasi",
+        "tagline": "Dikuasakan oleh MPV",
+        "todayTab": "Hari Ini",
+        "archiveTab": "Arkib",
+        "bookmarksTab": "Tanda Buku",
+        "searchTab": "Cari",
+        "settingsTab": "Tetapan",
+        "aboutTab": "Tentang",
+        "historicalPassage": "Ayat Arkib",
+        "historicalNote": "Anda sedang melihat ayat arkib pilihan daripada arkib Qur'an PoTD.",
+        "btnReturnToday": "Kembali ke Hari Ini",
+        "btnBackToToday": "Kembali ke Ayat Hari Ini",
+        "btnCopy": "Salin",
+        "btnShare": "Kongsi",
+        "btnListen": "Dengar",
+        "btnBookmark": "Tanda Buku",
+        "btnNext": "Seterusnya",
+        "btnPrevious": "Sebelumnya",
+        "themeAuto": "Sistem",
         "themeLight": "Cerah",
         "themeDark": "Gelap",
-        "themeSystem": "Sistem",
-        "settingsLanguage": "Bahasa Aplikasi",
-        "settingsTranslationMode": "Mod Terjemahan",
-        "translationModeTasreef": "Tasreef (Akademik)",
-        "translationModeDefault": "Biasa (Default)",
-        "settingsArabicSize": "Saiz Teks Arab",
-        "settingsTranslationSize": "Saiz Teks Terjemahan",
-        "settingsNotifications": "Notifikasi Harian",
-        "bookmarksUnlock": "Buka kunci penanda buku dengan Premium",
-        "bookmarksTitle": "Penanda Buku Anda",
-        "bookmarksEmpty": "Tiada penanda buku lagi.",
+        "themeSepia": "Sepia",
+        "bookmarksTitle": "Tanda Buku Anda",
+        "bookmarksEmpty": "Tiada ayat yang ditanda buku lagi.",
         "searchTitle": "Cari Arkib",
         "searchPlaceholder": "Cari kata kunci, kata dasar, topik...",
         "searchEmpty": "Masukkan kata kunci, topik, atau kata dasar Arab untuk mencari.",
         "searchNoResults": "Tiada ayat sepadan ditemui. Sila semak ejaan atau istilah lain.",
-        "paywallTitle": "Buka Kunci Arkib",
-        "paywallDescription": "Mengakses hari bersejarah dan menyemak ayat terdahulu adalah fungsi arkib premium.",
-        "paywallFeatNav": "Navigasi hari bersejarah tanpa had",
+        "paywallTitle": "Langgan Premium",
+        "paywallDescription": "Mengakses ayat terdahulu, carian, dan tanda buku adalah fungsi premium.",
+        "paywallFeatNav": "Navigasi ayat terdahulu",
         "paywallFeatBookmarks": "Tanda buku ayat pilihan",
         "paywallFeatSearch": "Cari arkib mengikut kata kunci",
         "paywallFeatRecital": "Alunan audio bacaan",
         "paywallFeatSupport": "Sokong nilai progresif & pembangunan kandungan",
-        "paywallTrialTitle": "Mulakan Cubaan Percuma 7 Hari",
-        "paywallTrialSub": "Kemudian RM39.90 setahun. Batal bila-bila masa.",
-        "paywallMonthly": "Langgan Bulanan - RM3.90 sebulan",
-        "paywallYearly": "Langgan Tahunan - RM39.90 setahun",
+        "paywallYearlyPrice": "RM39.90 / setahun",
+        "paywallYearlySub": "Termasuk percubaan percuma 7 hari • Batal bila-bila masa",
+        "paywallMonthlyPrice": "RM3.90 / sebulan",
+        "paywallMonthlySub": "Dibilkan setiap bulan • Batal bila-bila masa",
         "paywallSave": "Jimat 16%",
         "paywallRestore": "Pulihkan Pembelian",
         "paywallPrivacy": "Dasar Privasi",
         "paywallTermsLink": "Syarat Penggunaan",
-        "paywallTerms": "Bayaran akan dicaj ke akaun iTunes/Google Play anda semasa pengesahan pembelian. Langganan diperbaharui secara automatik melainkan pembaharuan automatik dimatikan sekurang-kurangnya 24 jam sebelum tamat tempoh semasa. Akaun anda akan dicaj untuk pembaharuan dalam tempoh 24 jam sebelum tamat tempoh semasa. Langganan boleh diuruskan oleh pengguna dan pembaharuan automatik boleh dimatikan dengan pergi ke Tetapan Akaun selepas pembelian. Sebarang bahagian percubaan percuma yang tidak digunakan, jika ditawarkan, akan terbatal apabila anda membeli langganan.",
+        "paywallTerms": "Bayaran akan dicaj ke akaun Apple ID / Google Play anda semasa pengesahan pembelian. Langganan diperbaharui secara automatik melainkan pembaharuan automatik dimatikan sekurang-kurangnya 24 jam sebelum tamat tempoh semasa. Akaun anda akan dicaj untuk pembaharuan dalam tempoh 24 jam sebelum tamat tempoh semasa. Langganan boleh diuruskan atau dibatalkan dalam Tetapan Akaun selepas pembelian. Sebarang bahagian tempoh percubaan percuma yang tidak digunakan akan terbatal apabila membeli langganan.",
         "paywallSimulation": "ℹ️ Mod Simulasi: Pembelian disimulasikan untuk tujuan penilaian. Tiada wang sebenar yang dicaj.",
         "updateTitle": "Kemas Kini Tersedia",
         "updateDescOptional": "Versi baharu Ayat Al-Qur'an Pilihan Harian telah tersedia. Sila kemas kini untuk menikmati ciri-ciri baharu.",
@@ -432,7 +471,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const paywallCloseBtn = document.getElementById("paywall-close-btn");
     const paywallSubscribeMonthlyBtn = document.getElementById("paywall-subscribe-monthly-btn");
     const paywallSubscribeYearlyBtn = document.getElementById("paywall-subscribe-yearly-btn");
-    const paywallTrialBtn = document.getElementById("paywall-trial-btn");
     const paywallRestoreBtn = document.getElementById("paywall-restore-btn");
 
     // Bookmark Elements
@@ -1186,6 +1224,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert(diagInfo);
     }
 
+    function getSubscriptionTermsText(lang) {
+        const isIos = (typeof window.Capacitor !== 'undefined' && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios');
+        const isAndroid = (typeof window.Capacitor !== 'undefined' && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android');
+        
+        if (lang === "ms") {
+            const storeAccount = isIos ? "akaun Apple ID" : (isAndroid ? "akaun Google Play" : "akaun");
+            const storeSettings = isIos ? "Tetapan Akaun App Store" : (isAndroid ? "Tetapan Akaun Google Play" : "Tetapan Akaun");
+            return `Bayaran akan dicaj ke ${storeAccount} anda semasa pengesahan pembelian. Langganan diperbaharui secara automatik melainkan pembaharuan automatik dimatikan sekurang-kurangnya 24 jam sebelum tamat tempoh semasa. Akaun anda akan dicaj untuk pembaharuan dalam tempoh 24 jam sebelum tamat tempoh semasa. Langganan boleh diuruskan atau dibatalkan dalam ${storeSettings} selepas pembelian. Sebarang bahagian tempoh percubaan percuma yang tidak digunakan akan terbatal apabila membeli langganan.`;
+        } else {
+            const storeAccount = isIos ? "your Apple ID account" : (isAndroid ? "your Google Play account" : "your account");
+            const storeSettings = isIos ? "your App Store Account Settings" : (isAndroid ? "your Google Play Account Settings" : "your Account Settings");
+            return `Payment will be charged to ${storeAccount} at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. Subscriptions may be managed or cancelled in ${storeSettings} after purchase. Any unused portion of a free trial period, if offered, will be forfeited when purchasing a subscription.`;
+        }
+    }
+
     function applyLocalization(lang) {
         const strings = locales[lang] || locales["en"];
 
@@ -1275,17 +1328,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         const paywallFeatSupport = document.getElementById("paywall-feat-support");
         if (paywallFeatSupport) paywallFeatSupport.innerText = strings.paywallFeatSupport;
 
-        const paywallTrialBtnTitle = document.getElementById("paywall-trial-btn-title");
-        if (paywallTrialBtnTitle) paywallTrialBtnTitle.innerText = strings.paywallTrialTitle;
+        const paywallYearlyBtnPrice = document.getElementById("paywall-yearly-btn-price");
+        if (paywallYearlyBtnPrice && !paywallYearlyBtnPrice.dataset.dynamic) paywallYearlyBtnPrice.innerText = strings.paywallYearlyPrice;
 
-        const paywallTrialBtnSub = document.getElementById("paywall-trial-btn-sub");
-        if (paywallTrialBtnSub) paywallTrialBtnSub.innerText = strings.paywallTrialSub;
+        const paywallYearlyBtnSub = document.getElementById("paywall-yearly-btn-sub");
+        if (paywallYearlyBtnSub) paywallYearlyBtnSub.innerText = strings.paywallYearlySub;
 
-        const paywallMonthlyBtnLabel = document.getElementById("paywall-monthly-btn-label");
-        if (paywallMonthlyBtnLabel) paywallMonthlyBtnLabel.innerText = strings.paywallMonthly;
+        const paywallMonthlyBtnPrice = document.getElementById("paywall-monthly-btn-price");
+        if (paywallMonthlyBtnPrice && !paywallMonthlyBtnPrice.dataset.dynamic) paywallMonthlyBtnPrice.innerText = strings.paywallMonthlyPrice;
 
-        const paywallYearlyBtnLabel = document.getElementById("paywall-yearly-btn-label");
-        if (paywallYearlyBtnLabel) paywallYearlyBtnLabel.innerText = strings.paywallYearly;
+        const paywallMonthlyBtnSub = document.getElementById("paywall-monthly-btn-sub");
+        if (paywallMonthlyBtnSub) paywallMonthlyBtnSub.innerText = strings.paywallMonthlySub;
 
         const paywallSaveBadgeLabel = document.getElementById("paywall-save-badge-label");
         if (paywallSaveBadgeLabel) paywallSaveBadgeLabel.innerText = strings.paywallSave;
@@ -1294,7 +1347,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (paywallRestoreBtnLabel) paywallRestoreBtnLabel.innerText = strings.paywallRestore;
 
         const paywallTermsLabel = document.getElementById("paywall-terms-label");
-        if (paywallTermsLabel) paywallTermsLabel.innerText = strings.paywallTerms;
+        if (paywallTermsLabel) paywallTermsLabel.innerText = getSubscriptionTermsText(lang);
 
         const paywallPrivacyLink = document.getElementById("paywall-privacy-link");
         if (paywallPrivacyLink) paywallPrivacyLink.innerText = strings.paywallPrivacy;
@@ -1384,11 +1437,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const subStatusEl = document.getElementById("about-subscription-status");
         if (subStatusEl) {
             if (isSubscribed && activePlanType) {
-                const planName = activePlanType === "yearly" ? strings.planYearly : (activePlanType === "monthly" ? strings.planMonthly : strings.planPremium);
-                subStatusEl.innerText = strings.subStatusSubscribed.replace("{plan}", planName);
+                const planName = activePlanType === "yearly" ? (strings.planYearly || "yearly") : (activePlanType === "monthly" ? (strings.planMonthly || "monthly") : (strings.planPremium || "premium"));
+                const template = strings.subStatusSubscribed || "You're currently subscribed to the {plan} plan.";
+                subStatusEl.innerText = template.replace("{plan}", planName);
                 subStatusEl.style.color = "var(--accent)";
             } else {
-                subStatusEl.innerText = strings.subStatusFree;
+                subStatusEl.innerText = strings.subStatusFree || "You are currently on the Free plan.";
                 subStatusEl.style.color = "var(--text-muted)";
             }
         }
@@ -1479,27 +1533,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     function showPaywall() {
         if (paywallModal) {
             const paywallSimLabel = document.getElementById("paywall-simulation-label");
+            const paywallTitle = document.getElementById("paywall-title-label");
+            const paywallDesc = document.getElementById("paywall-description-label");
+            const paywallActions = paywallModal.querySelector(".paywall-actions");
+            const paywallTerms = document.getElementById("paywall-terms-label");
+            const paywallLinksContainer = document.getElementById("paywall-links-container");
+            const paywallWebPromo = document.getElementById("paywall-web-promo");
+
+            // Apply current localized strings
+            const strings = locales[currentLanguage] || locales["en"];
+            if (paywallTitle) paywallTitle.innerText = strings.paywallTitle;
+            if (paywallDesc) paywallDesc.innerText = strings.paywallDescription;
+
+            if (paywallActions) paywallActions.classList.remove("hidden");
+            if (paywallTerms) {
+                paywallTerms.innerText = getSubscriptionTermsText(currentLanguage);
+                paywallTerms.classList.remove("hidden");
+            }
+            if (paywallLinksContainer) paywallLinksContainer.classList.remove("hidden");
+            if (paywallWebPromo) paywallWebPromo.classList.add("hidden");
+
             if (!isCapacitor) {
-                // Adapt standard paywall modal to be a Download App promotion on Web
-                const paywallTitle = document.getElementById("paywall-title-label");
-                const paywallDesc = document.getElementById("paywall-description-label");
-                if (paywallTitle) paywallTitle.textContent = "Unlock the Archive on the App";
-                if (paywallDesc) paywallDesc.textContent = "Accessing historical days, searching the archive, and bookmarking passages are features available in our mobile app.";
-
-                // Hide native trial, purchase buttons, terms, and simulation warning
-                const paywallActions = paywallModal.querySelector(".paywall-actions");
-                const paywallTerms = document.getElementById("paywall-terms-label");
-                const paywallLinksContainer = document.getElementById("paywall-links-container");
-                if (paywallActions) paywallActions.classList.add("hidden");
-                if (paywallTerms) paywallTerms.classList.add("hidden");
-                if (paywallLinksContainer) paywallLinksContainer.classList.add("hidden");
-                if (paywallSimLabel) paywallSimLabel.classList.add("hidden");
-
-                // Show web promotional badges
-                const paywallWebPromo = document.getElementById("paywall-web-promo");
-                if (paywallWebPromo) paywallWebPromo.classList.remove("hidden");
+                // Web mode: Show simulation note so visitors know payments are in testing/simulation mode
+                if (paywallSimLabel) paywallSimLabel.classList.remove("hidden");
             } else {
                 // Native App environment
+                updatePaywallOfferings();
                 if (paywallSimLabel) {
                     if (IS_TESTING_MODE) {
                         paywallSimLabel.classList.remove("hidden");
@@ -1511,6 +1570,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             paywallModal.classList.remove("hidden");
         }
     }
+
+    // Expose helpers on window for developer testing
+    window.getSubscriptionTermsText = getSubscriptionTermsText;
+    window.showPaywall = showPaywall;
 
     if (paywallCloseBtn) {
         paywallCloseBtn.onclick = () => {
@@ -2153,6 +2216,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    async function updatePaywallOfferings() {
+        if (isCapacitor && !IS_TESTING_MODE && window.buildFlavor !== 'hms') {
+            try {
+                const { Purchases } = window.Capacitor.Plugins;
+                if (Purchases) {
+                    const offerings = await Purchases.getOfferings();
+                    if (offerings && offerings.current) {
+                        const yearlyPkg = offerings.current.annual;
+                        const monthlyPkg = offerings.current.monthly;
+                        const yearlyPriceEl = document.getElementById("paywall-yearly-btn-price");
+                        const monthlyPriceEl = document.getElementById("paywall-monthly-btn-price");
+
+                        if (yearlyPkg && yearlyPkg.product && yearlyPkg.product.priceString && yearlyPriceEl) {
+                            yearlyPriceEl.innerText = `${yearlyPkg.product.priceString} / ${currentLanguage === 'ms' ? 'setahun' : 'year'}`;
+                            yearlyPriceEl.dataset.dynamic = "true";
+                        }
+                        if (monthlyPkg && monthlyPkg.product && monthlyPkg.product.priceString && monthlyPriceEl) {
+                            monthlyPriceEl.innerText = `${monthlyPkg.product.priceString} / ${currentLanguage === 'ms' ? 'sebulan' : 'month'}`;
+                            monthlyPriceEl.dataset.dynamic = "true";
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn("[PAYWALL] Failed to update dynamic offering prices:", e);
+            }
+        }
+    }
+
     if (paywallSubscribeMonthlyBtn) {
         paywallSubscribeMonthlyBtn.onclick = () => {
             logAnalyticsEvent('subscribe_monthly_click');
@@ -2170,16 +2261,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ? 'premium_archive_yearly'
                 : 'premium_archive_yearly:yearly-base-plan';
             purchaseSubscription('yearly', fallbackId);
-        };
-    }
-
-    if (paywallTrialBtn) {
-        paywallTrialBtn.onclick = () => {
-            logAnalyticsEvent('subscribe_trial_click');
-            const fallbackId = isCapacitor && window.Capacitor.getPlatform() === 'ios'
-                ? 'premium_archive_yearly'
-                : 'premium_archive_yearly:yearly-base-plan';
-            purchaseSubscription('trial', fallbackId);
         };
     }
 
@@ -2285,6 +2366,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         }
                         await Purchases.configure({ apiKey: apiKey });
                         console.log("[DEBUG CLIENT] RevenueCat configured.");
+                        updatePaywallOfferings();
 
                         const customerInfo = await Purchases.getCustomerInfo();
                         const activeEnt = hasActiveEntitlement(customerInfo);
