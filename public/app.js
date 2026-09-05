@@ -746,7 +746,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (dateStr < localTodayStr && !isSubscribed && !hideNavArrows) {
             console.warn(`[DEBUG CLIENT] Access denied to historical date [${dateStr}]. Redirecting to today.`);
             currentDateInstance = new Date();
-            showPaywall();
+            showPaywall('history_date');
             return loadPassageForDate(currentDateInstance);
         }
 
@@ -1156,7 +1156,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             `;
             card.onclick = () => {
                 if (card.classList.contains("premium-locked")) {
-                    showPaywall();
+                    showPaywall('tasreef_card');
                     return;
                 }
                 logAnalyticsEvent('concordance_card_click', { root: item.root, word: item.word });
@@ -1558,7 +1558,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!isSubscribed) {
                 console.log("[DEBUG CLIENT] Gating history: showing subscription paywall");
                 logAnalyticsEvent('prev_day_click_gated');
-                showPaywall();
+                showPaywall('prev_day_nav');
                 return;
             }
             currentDateInstance.setDate(currentDateInstance.getDate() - 1);
@@ -1576,7 +1576,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (activeDateStr < localTodayStr && !isSubscribed) {
                 console.log("[DEBUG CLIENT] Gating next button on historical date: showing paywall");
                 logAnalyticsEvent('next_day_click_gated');
-                showPaywall();
+                showPaywall('next_day_nav');
                 return;
             }
             currentDateInstance.setDate(currentDateInstance.getDate() + 1);
@@ -1602,8 +1602,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
     }
 
-    function showPaywall() {
+    function showPaywall(triggerSource = 'direct') {
         if (paywallModal) {
+            logAnalyticsEvent('paywall_open', { trigger: triggerSource });
             const paywallSimLabel = document.getElementById("paywall-simulation-label");
             const paywallTitle = document.getElementById("paywall-title-label");
             const paywallDesc = document.getElementById("paywall-description-label");
@@ -1649,6 +1650,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (paywallCloseBtn) {
         paywallCloseBtn.onclick = () => {
+            logAnalyticsEvent('paywall_close');
             paywallModal.classList.add("hidden");
         };
     }
@@ -1662,7 +1664,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     window.addEventListener("click", (e) => {
         if (e.target === aboutModal) aboutModal.classList.add("hidden");
-        if (e.target === paywallModal) paywallModal.classList.add("hidden");
+        if (e.target === paywallModal) {
+            logAnalyticsEvent('paywall_close');
+            paywallModal.classList.add("hidden");
+        }
         if (e.target === bookmarksModal) bookmarksModal.classList.add("hidden");
         if (e.target === searchModal) searchModal.classList.add("hidden");
         if (e.target === shareModal) shareModal.classList.add("hidden");
@@ -1672,7 +1677,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
             if (aboutModal) aboutModal.classList.add("hidden");
-            if (paywallModal) paywallModal.classList.add("hidden");
+            if (paywallModal && !paywallModal.classList.contains("hidden")) {
+                logAnalyticsEvent('paywall_close');
+                paywallModal.classList.add("hidden");
+            }
             if (bookmarksModal) bookmarksModal.classList.add("hidden");
             if (searchModal) searchModal.classList.add("hidden");
             if (shareModal) shareModal.classList.add("hidden");
@@ -1890,7 +1898,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!isSubscribed) {
                 console.log("[DEBUG CLIENT] Gating bookmarks: showing subscription paywall");
                 logAnalyticsEvent('bookmark_click_gated');
-                showPaywall();
+                showPaywall('bookmark_action');
                 return;
             }
             toggleBookmark();
@@ -1900,7 +1908,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (bookmarksGatedView) {
         bookmarksGatedView.onclick = () => {
             console.log("[DEBUG CLIENT] Gating bookmarks view: showing subscription paywall");
-            showPaywall();
+            showPaywall('bookmarks_view');
         };
     }
 
@@ -2096,7 +2104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!isSubscribed) {
                 console.log("[DEBUG CLIENT] Gating search: showing subscription paywall");
                 logAnalyticsEvent('search_click_gated');
-                showPaywall();
+                showPaywall('search_feature');
                 return;
             }
             logAnalyticsEvent('search_open_click');
@@ -2217,23 +2225,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (purchaseResult.returnCode === 0 && purchaseResult.inAppPurchaseData) {
                         const purchaseData = JSON.parse(purchaseResult.inAppPurchaseData);
                         if (purchaseData.payState === 0) {
+                            logAnalyticsEvent('purchase_success', { plan: 'hms', product_id: productId });
                             unlockPremiumAccess("Subscription Active! Premium access unlocked via Huawei AppGallery.");
                             return;
                         }
                     }
+                    logAnalyticsEvent('purchase_failed', { plan: 'hms', product_id: productId, code: purchaseResult.returnCode });
                     showToast(`Huawei Purchase result code: ${purchaseResult.returnCode}`);
                 } else {
+                    logAnalyticsEvent('purchase_failed', { plan: 'hms', product_id: productId, error: 'env_not_ready' });
                     showToast(`Huawei HMS environment not ready (Code ${envReadyResult.returnCode})`);
                 }
             } catch (err) {
                 console.error("[HMS IAP] Error during Huawei IAP purchase:", err);
                 const detail = err ? (err.message || JSON.stringify(err)) : "Unknown error";
+                logAnalyticsEvent('purchase_failed', { plan: 'hms', product_id: productId, error: detail });
                 showToast(`Huawei Billing error: ${detail}`);
             }
         } else {
             console.warn("[HMS IAP] Huawei IAP plugin not detected. Simulating HMS purchase...");
             const expiryTime = Date.now() + 5 * 60 * 1000;
             localStorage.setItem("simulated_subscription_expiry", expiryTime);
+            logAnalyticsEvent('purchase_success', { plan: 'hms', is_simulation: true });
             unlockPremiumAccess(`[MOCK HMS] Subscription Active! Unlocked (active for 5 mins).`);
         }
     }
@@ -2251,10 +2264,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const offerings = await Purchases.getOfferings();
                     const rcPackageKey = (packageType === 'yearly' || packageType === 'trial') ? 'annual' : packageType;
                     if (offerings.current && offerings.current[rcPackageKey]) {
+                        const pkg = offerings.current[rcPackageKey];
                         const purchaseResult = await Purchases.purchasePackage({
-                            aPackage: offerings.current[rcPackageKey]
+                            aPackage: pkg
                         });
                         if (hasActiveEntitlement(purchaseResult.customerInfo)) {
+                            logAnalyticsEvent('purchase_success', {
+                                plan: packageType,
+                                product_id: pkg.product ? pkg.product.identifier : fallbackProductId
+                            });
                             unlockPremiumAccess("Subscription Active! Premium access unlocked.");
                             return;
                         }
@@ -2264,6 +2282,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                             productId: fallbackProductId
                         });
                         if (hasActiveEntitlement(purchaseResult.customerInfo)) {
+                            logAnalyticsEvent('purchase_success', {
+                                plan: packageType,
+                                product_id: fallbackProductId
+                            });
                             unlockPremiumAccess("Subscription Active! Premium access unlocked.");
                             return;
                         }
@@ -2272,9 +2294,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             } catch (err) {
                 console.error("[DEBUG CLIENT] RevenueCat purchase failed:", err);
                 if (err && err.userCancelled) {
+                    logAnalyticsEvent('purchase_cancelled', { plan: packageType });
                     showToast("Purchase cancelled.");
                 } else {
                     const errMsg = err ? (err.message || err.readableErrorCode || JSON.stringify(err)) : "Unknown error";
+                    logAnalyticsEvent('purchase_failed', { plan: packageType, error: errMsg });
                     showToast(`Purchase failed: ${errMsg}`);
                 }
             }
@@ -2284,6 +2308,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const expiryTime = Date.now() + 5 * 60 * 1000; // 5 minutes in ms
             localStorage.setItem("simulated_subscription_expiry", expiryTime);
             localStorage.setItem("simulated_subscription_plan", packageType);
+            logAnalyticsEvent('purchase_success', { plan: packageType, is_simulation: true });
             unlockPremiumAccess(`Simulated ${packageType.toUpperCase()} Subscription Active! Unlocked (active for 5 mins).`);
         }
     }
@@ -2319,6 +2344,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (paywallSubscribeMonthlyBtn) {
         paywallSubscribeMonthlyBtn.onclick = () => {
             logAnalyticsEvent('subscribe_monthly_click');
+            logAnalyticsEvent('subscribe_click', { plan: 'monthly' });
             const fallbackId = isCapacitor && window.Capacitor.getPlatform() === 'ios'
                 ? 'premium_archive_monthly'
                 : 'premium_archive_monthly:monthly-base-plan';
@@ -2329,6 +2355,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (paywallSubscribeYearlyBtn) {
         paywallSubscribeYearlyBtn.onclick = () => {
             logAnalyticsEvent('subscribe_yearly_click');
+            logAnalyticsEvent('subscribe_click', { plan: 'yearly' });
             const fallbackId = isCapacitor && window.Capacitor.getPlatform() === 'ios'
                 ? 'premium_archive_yearly'
                 : 'premium_archive_yearly:yearly-base-plan';
