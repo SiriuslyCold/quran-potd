@@ -320,8 +320,8 @@ h1 {
     border: 1px solid var(--card-border);
     border-radius: 16px;
     padding: 1.5rem 1.8rem;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
-    margin-bottom: 1.25rem;
+    box-shadow: 0 10px 30px -10px var(--shadow-color);
+    margin-bottom: 0;
     position: relative;
     overflow: hidden;
     transform: translateZ(0);
@@ -334,7 +334,7 @@ h1 {
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--accent);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid var(--card-border);
     padding-bottom: 0.6rem;
     margin-top: 0;
     margin-bottom: 1.2rem;
@@ -443,15 +443,11 @@ h1 {
     100% { transform: scale(1); }
 }
 
-/* Thematic Reflection Card with Imagen Image background */
+/* Thematic Reflection Card */
 .overview-box {
     font-size: var(--english-font-size);
-    line-height: 1.7rem;
+    line-height: 1.75rem;
     color: var(--text-main);
-    background: var(--overview-bg);
-    padding: 1.2rem;
-    border-radius: 10px;
-    border: 1px solid var(--card-border);
     white-space: pre-line;
 }
 
@@ -467,6 +463,12 @@ h1 {
 .overview-prompt {
     color: var(--gold);
     font-weight: 600;
+    background: var(--gold-light);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    margin-top: 1rem;
+    display: block;
 }
 
 
@@ -658,6 +660,11 @@ h1 {
         gap: 1.25rem; /* Standard separation between Reflection and Tasreef cards */
         margin: 0;
         padding: 0;
+    }
+
+    .card {
+        padding: 1.2rem 1.25rem;
+        border-radius: 14px;
     }
 
     .tasreef-grid {

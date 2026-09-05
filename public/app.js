@@ -41,7 +41,7 @@ let activeAudioButton = null; // Currently playing verse button DOM reference
 
 const OG_DESCRIPTION = "Explore daily linguistic breakdowns, morphological analysis, and clear contextual overviews of the Qur'an.";
 const OG_IMAGE = "https://quran-potd.web.app/quran-potd-social.jpg";
-const APP_VERSION = "1.6.4";
+const APP_VERSION = "1.6.5";
 
 const SURAH_NAMES = [
     "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
@@ -81,6 +81,16 @@ const locales = {
         "btnPrevious": "Previous",
         "sectionOverview": "Thematic Overview",
         "sectionTasreef": "Key Morphological Analysis (Tasreef)",
+        "tasreefTriliteralRoot": "Triliteral Root (جذر):",
+        "tasreefPatternWeight": "Pattern Weight (وزن):",
+        "concordanceTitle": "Root Occurrences",
+        "concordanceOccurrencesOf": "Occurrences of Root: {root}",
+        "concordanceTargetWord": "Target Word:",
+        "concordanceWaznRoot": "Wazn / Root:",
+        "concordanceRootLabel": "Root:",
+        "concordanceLoading": "Fetching concordance...",
+        "concordanceEmpty": "No occurrences found for this root.",
+        "concordanceError": "Failed to load occurrences: {error}",
         "settingsTitle": "Display Settings",
         "settingsTheme": "App Theme",
         "themeAuto": "System",
@@ -173,6 +183,8 @@ const locales = {
     },
     "ms": {
         "tagline": "Dikuasakan oleh MPV",
+        "appTitle": "Petikan Al-Qur'an Harian",
+        "dateLocale": "ms-MY",
         "todayTab": "Hari Ini",
         "archiveTab": "Arkib",
         "bookmarksTab": "Tanda Buku",
@@ -189,10 +201,33 @@ const locales = {
         "btnBookmark": "Tanda Buku",
         "btnNext": "Seterusnya",
         "btnPrevious": "Sebelumnya",
+        "sectionOverview": "Gambaran Keseluruhan Tematik",
+        "sectionTasreef": "Analisis Morfologi Utama (Tasrif)",
+        "tasreefTriliteralRoot": "Kata Dasar Tiga Huruf (جذر):",
+        "tasreefPatternWeight": "Pola Timbangan (وزن):",
+        "concordanceTitle": "Kemunculan Kata Dasar",
+        "concordanceOccurrencesOf": "Kemunculan Kata Dasar: {root}",
+        "concordanceTargetWord": "Perkataan Sasaran:",
+        "concordanceWaznRoot": "Wazn / Kata Dasar:",
+        "concordanceRootLabel": "Kata Dasar:",
+        "concordanceLoading": "Memuat turun konkordans...",
+        "concordanceEmpty": "Tiada kemunculan ditemui untuk kata dasar ini.",
+        "concordanceError": "Gagal memuat turun kemunculan: {error}",
+        "settingsTitle": "Tetapan Paparan",
+        "settingsTheme": "Tema Aplikasi",
         "themeAuto": "Sistem",
         "themeLight": "Cerah",
         "themeDark": "Gelap",
         "themeSepia": "Sepia",
+        "themeSystem": "Sistem",
+        "settingsLanguage": "Bahasa Aplikasi",
+        "settingsTranslationMode": "Mod Terjemahan",
+        "translationModeTasreef": "Tasrif (Akademik)",
+        "translationModeDefault": "Lalai",
+        "settingsArabicSize": "Saiz Teks Bahasa Arab",
+        "settingsTranslationSize": "Saiz Teks Terjemahan",
+        "settingsNotifications": "Pemberitahuan Harian",
+        "bookmarksUnlock": "Buka kunci tanda buku dengan Premium",
         "bookmarksTitle": "Tanda Buku Anda",
         "bookmarksEmpty": "Tiada ayat yang ditanda buku lagi.",
         "searchTitle": "Cari Arkib",
@@ -217,7 +252,7 @@ const locales = {
         "paywallTerms": "Bayaran akan dicaj ke akaun Apple ID / Google Play anda semasa pengesahan pembelian. Langganan diperbaharui secara automatik melainkan pembaharuan automatik dimatikan sekurang-kurangnya 24 jam sebelum tamat tempoh semasa. Akaun anda akan dicaj untuk pembaharuan dalam tempoh 24 jam sebelum tamat tempoh semasa. Langganan boleh diuruskan atau dibatalkan dalam Tetapan Akaun selepas pembelian. Sebarang bahagian tempoh percubaan percuma yang tidak digunakan akan terbatal apabila membeli langganan.",
         "paywallSimulation": "ℹ️ Mod Simulasi: Pembelian disimulasikan untuk tujuan penilaian. Tiada wang sebenar yang dicaj.",
         "updateTitle": "Kemas Kini Tersedia",
-        "updateDescOptional": "Versi baharu Ayat Al-Qur'an Pilihan Harian telah tersedia. Sila kemas kini untuk menikmati ciri-ciri baharu.",
+        "updateDescOptional": "Versi baharu Petikan Al-Qur'an Harian telah tersedia. Sila kemas kini untuk menikmati ciri-ciri baharu.",
         "updateDescMandatory": "Kemas kini kritikal tersedia. Anda mesti mengemas kini aplikasi untuk terus menggunakan perkhidmatan ini.",
         "updateVersionInfo": "Versi baharu: {version}",
         "updateNow": "Kemas Kini Sekarang",
@@ -225,14 +260,30 @@ const locales = {
         "loaderText": "Memuat turun ayat...",
         "toastBookmarkAdded": "✅ Ayat ditanda buku!",
         "toastBookmarkRemoved": "❌ Tanda buku dibuang!",
+        "toastMaxBookmarks": "Maksimum 50 tanda buku telah dicapai",
+        "toastSearchEmpty": "Sila masukkan pertanyaan carian",
+        "toastCopySuccess": "Ayat disalin ke papan klip!",
+        "toastCopyFail": "Gagal menyalin ayat",
+        "toastNativeShareFail": "Perkongsian gagal: ",
+        "toastAudioError": "Gagal memainkan alunan audio.",
+        "toastAudioUnsupported": "Format audio tidak disokong pada peranti ini.",
+        "toastAudioNotFound": "Fail audio bacaan tidak ditemui.",
+        "toastAudioBlocked": "Main semula audio disekat. Sila berinteraksi dengan halaman terlebih dahulu.",
+        "toastAudioNetwork": "Ralat rangkaian semasa memuatkan audio bacaan.",
         "toastOffline": "📶 Menunjukkan ayat luar talian yang disimpan",
         "toastConnectionError": "Tidak dapat memuat turun ayat hari ini. Sila periksa sambungan rangkaian anda dan cuba lagi.",
         "toastRetry": "Cuba Lagi",
         "toastCopied": "✅ Ayat disalin ke papan klip!",
         "toastSimulatedUnlock": "Langganan Bulanan Simulasi Aktif! Dibuka (aktif selama 5 minit).",
+        "toastSimulatedPurchased": "Pembelian simulasi berjaya! Arkib premium dibuka.",
         "toastSimulatedRestore": "Pembelian simulasi telah dipulihkan!",
+        "toastSimulatedActive": "Anda sudah mempunyai akses arkib premium simulasi yang aktif.",
         "toastPurchaseFailed": "Pembelian dibatalkan atau gagal.",
         "toastPremiumUnlocked": "Langganan Aktif! Akses premium dibuka.",
+        "toastSubActive": "Langganan Aktif! Akses premium dibuka.",
+        "toastSyncSuccess": "Arkib berjaya disegerakkan.",
+        "toastSyncFail": "Penyegerakan gagal: ",
+        "toastAppUpToDate": "Aplikasi adalah terkini.",
         "tooltipSettings": "Tetapan Paparan & Tema",
         "tooltipAbout": "Mengenai Projek Ini",
         "tooltipShare": "Kongsi Ayat Pilihan",
@@ -243,7 +294,7 @@ const locales = {
         "shareTitle": "Kongsi Ayat Pilihan",
         "shareCopyLabel": "Salin Pautan & Teks",
         "shareDeviceLabel": "Kongsi melalui Peranti...",
-        "shareTextHeader": "📖 Ayat Al-Qur'an Pilihan Harian",
+        "shareTextHeader": "📖 Petikan Al-Qur'an Harian",
         "shareTextVerses": "Ayat",
         "shareTextLink": "🔗 Lihat huraian linguistik kata kunci dan bacaan:",
         "subStatusFree": "Anda kini menggunakan pelan Percuma.",
@@ -854,7 +905,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         console.log("[DEBUG CONCORDANCE] Extracted cleanRoot for API:", cleanRoot);
 
-        concordanceModalTitle.innerText = `Occurrences of Root: ${item.root.trim()}`;
+        const strings = getLanguageStrings(currentLanguage);
+        concordanceModalTitle.innerText = strings.concordanceOccurrencesOf.replace("{root}", item.root.trim());
         concordanceModal.classList.remove("hidden");
         concordanceLoading.classList.remove("hidden");
         concordanceResultsList.innerHTML = "";
@@ -890,14 +942,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             concordanceWordInfo.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <span style="font-weight: 700; color: var(--accent);">Target Word:</span>
+                    <span style="font-weight: 700; color: var(--accent);">${strings.concordanceTargetWord}</span>
                     <span style="font-family: 'Amiri', serif; font-size: 1.2rem; color: var(--tasreef-word-color); direction: rtl; text-align: right;">
                         ${wordArabic} ${wordTranslit ? `<span style="font-size: 0.8rem; font-family: inherit; color: var(--text-muted);">(${wordTranslit})</span>` : ""}
                     </span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span style="font-weight: 700; color: var(--accent);">Wazn / Root:</span>
-                    <span style="color: var(--text-main);">${item.wazn} (Root: <strong style="color: var(--gold);">${item.root}</strong>)</span>
+                    <span style="font-weight: 700; color: var(--accent);">${strings.concordanceWaznRoot}</span>
+                    <span style="color: var(--text-main);">${item.wazn} (${strings.concordanceRootLabel} <strong style="color: var(--gold);">${item.root}</strong>)</span>
                 </div>
                 ${meaningHtml ? `
                 <div style="border-top: 1px dashed var(--card-border); padding-top: 0.5rem; margin-top: 0.5rem; color: var(--text-muted); line-height: 1.25rem;">
@@ -915,6 +967,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const response = await fetch(url);
             console.log("[DEBUG CONCORDANCE] Response received. Status:", response.status, "OK:", response.ok);
             if (!response.ok) {
+                if (response.status === 404) {
+                    console.log("[DEBUG CONCORDANCE] Root not found in database (404):", cleanRoot);
+                    concordanceLoading.classList.add("hidden");
+                    concordanceResultsList.innerHTML = `<p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); padding: 2rem; margin: 0;">${strings.concordanceEmpty}</p>`;
+                    return;
+                }
                 throw new Error(`Server returned status ${response.status}`);
             }
             const data = await response.json();
@@ -923,7 +981,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (!data.instances || data.instances.length === 0) {
                 console.log("[DEBUG CONCORDANCE] No concordance instances found for root:", cleanRoot);
-                concordanceResultsList.innerHTML = `<p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); padding: 2rem; margin: 0;">No occurrences found for this root.</p>`;
+                concordanceResultsList.innerHTML = `<p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); padding: 2rem; margin: 0;">${strings.concordanceEmpty}</p>`;
                 return;
             }
 
@@ -972,15 +1030,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("[DEBUG CONCORDANCE] Concordance Fetch Error:", err);
             concordanceLoading.classList.add("hidden");
             concordanceError.classList.remove("hidden");
-            concordanceErrorMsg.innerText = `Failed to load occurrences: ${err.message}`;
+            concordanceErrorMsg.innerText = strings.concordanceError.replace("{error}", err.message);
         }
     }
 
     function renderPassage(data) {
         const { meta, translations, overview, tasreef } = data;
+        const strings = getLanguageStrings(currentLanguage);
 
         // Set Heading Info
-        document.getElementById("passage-heading").innerText = `Surah ${meta.surahId} ${meta.surahName} (verses ${meta.range})`;
+        const versesLabel = currentLanguage === "ms" ? "ayat" : "verses";
+        document.getElementById("passage-heading").innerText = `Surah ${meta.surahId} ${meta.surahName} (${versesLabel} ${meta.range})`;
 
         // Populate Verses
         const versesContainer = document.getElementById("verses-container");
@@ -1085,11 +1145,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             card.innerHTML = `
                 ${wordHtml}
                 <div class="tasreef-detail-row">
-                    <span class="tasreef-label">Triliteral Root (جذر):</span> 
+                    <span class="tasreef-label">${strings.tasreefTriliteralRoot}</span> 
                     <span class="tasreef-value-highlight">${item.root}</span>
                 </div>
                 <div class="tasreef-detail-row">
-                    <span class="tasreef-label">Pattern Weight (وزن):</span> 
+                    <span class="tasreef-label">${strings.tasreefPatternWeight}</span> 
                     <span class="tasreef-value">${item.wazn}</span>
                 </div>
                 ${morphologyDescHtml}
@@ -1239,12 +1299,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    function getLanguageStrings(lang = currentLanguage) {
+        return Object.assign({}, locales["en"], locales[lang] || {});
+    }
+
     function applyLocalization(lang) {
-        const strings = locales[lang] || locales["en"];
+        const strings = getLanguageStrings(lang);
 
         // Header & Titles
         const appTitleHeader = document.getElementById("app-title-header");
         if (appTitleHeader) appTitleHeader.innerText = strings.appTitle;
+        if (strings.appTitle) document.title = strings.appTitle;
 
         const overviewHeadingLabel = document.getElementById("overview-heading-label");
         if (overviewHeadingLabel) overviewHeadingLabel.innerText = strings.sectionOverview;
@@ -1298,7 +1363,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const bookmarksBtnLabel = document.getElementById("bookmarks-btn-label");
         if (bookmarksBtnLabel) {
             const countVal = bookmarks ? bookmarks.length : 0;
-            const localizedBtnText = strings.bookmarksTitle.replace(" Penanda Buku Anda", " Penanda Buku").replace("Your Bookmarks", "Bookmarks");
+            const localizedBtnText = strings.bookmarksTab || strings.bookmarksTitle.replace(" Penanda Buku Anda", " Penanda Buku").replace("Tanda Buku Anda", "Tanda Buku").replace("Your Bookmarks", "Bookmarks");
             bookmarksBtnLabel.innerHTML = `<i class="fa-solid fa-bookmark" style="color: var(--gold);"></i> ${localizedBtnText} (<span id="bookmarks-count">${countVal}</span>)`;
         }
 
@@ -1417,6 +1482,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         const shareNativeBtnLabel = document.getElementById("share-native-btn-label");
         if (shareNativeBtnLabel) shareNativeBtnLabel.innerText = strings.shareDeviceLabel;
 
+        // Concordance Modal Labels
+        const concordanceModalTitle = document.getElementById("concordance-modal-title");
+        if (concordanceModalTitle) concordanceModalTitle.innerText = strings.concordanceTitle;
+
+        const concordanceLoadingText = document.getElementById("concordance-loading-text");
+        if (concordanceLoadingText) concordanceLoadingText.innerText = strings.concordanceLoading;
+
         // About Modal version number
         const aboutVersionLabel = document.getElementById("about-version-label");
         if (aboutVersionLabel) {
@@ -1449,7 +1521,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function showToast(message) {
-        const strings = locales[currentLanguage] || locales["en"];
+        const strings = getLanguageStrings(currentLanguage);
         let finalMessage = message;
         // Translate common notifications
         if (message.includes("copied to clipboard")) {
@@ -1541,7 +1613,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paywallWebPromo = document.getElementById("paywall-web-promo");
 
             // Apply current localized strings
-            const strings = locales[currentLanguage] || locales["en"];
+            const strings = getLanguageStrings(currentLanguage);
             if (paywallTitle) paywallTitle.innerText = strings.paywallTitle;
             if (paywallDesc) paywallDesc.innerText = strings.paywallDescription;
 
@@ -1618,7 +1690,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const activeDateStr = getLocalDateString(currentDateInstance);
             logAnalyticsEvent('share_passage_click', { date: activeDateStr, surah: meta.surahName });
 
-            const strings = locales[currentLanguage] || locales["en"];
+            const strings = getLanguageStrings(currentLanguage);
             const shareText = `${strings.shareTextHeader}\n\n✨ Surah ${meta.surahName} (${strings.shareTextVerses} ${meta.range})\n\n"${overview}"\n\n${strings.shareTextLink}\nhttps://quran-potd.web.app/?date=${activeDateStr}`;
 
             if (sharePreviewText) sharePreviewText.innerText = shareText;
@@ -1638,7 +1710,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!activePassageData) return;
             const { meta, overview } = activePassageData;
             const activeDateStr = getLocalDateString(currentDateInstance);
-            const strings = locales[currentLanguage] || locales["en"];
+            const strings = getLanguageStrings(currentLanguage);
             const shareText = `${strings.shareTextHeader}\n\n✨ Surah ${meta.surahName} (${strings.shareTextVerses} ${meta.range})\n\n"${overview}"\n\n${strings.shareTextLink}\nhttps://quran-potd.web.app/?date=${activeDateStr}`;
 
             try {
@@ -1656,7 +1728,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!activePassageData) return;
             const { meta, overview } = activePassageData;
             const activeDateStr = getLocalDateString(currentDateInstance);
-            const strings = locales[currentLanguage] || locales["en"];
+            const strings = getLanguageStrings(currentLanguage);
             const shareTitle = strings.appTitle;
             const shareText = `${strings.shareTextHeader}\n\n✨ Surah ${meta.surahName} (${strings.shareTextVerses} ${meta.range})\n\n"${overview}"\n\n${strings.shareTextLink}\nhttps://quran-potd.web.app/?date=${activeDateStr}`;
 

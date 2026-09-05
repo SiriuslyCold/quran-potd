@@ -29,7 +29,7 @@
         rel="stylesheet">
 
     <link rel="icon" type="image/png" href="img/quran-potd-logo.png">
-    <link rel="stylesheet" href="main.css?v=1.6.2">
+    <link rel="stylesheet" href="main.css?v=1.6.10">
 
     <!-- Open Graph Meta Tags -->
     <meta id="og:type" property="og:type" content="website" />
@@ -312,7 +312,13 @@
                     passage.
                 </p>
 
-                <p><strong>Note:</strong> In Arabic grammar, a triliteral root (<em>al-jathr</em>) carries the fundamental, broad meaning of a word family, while the pattern weight (<em>al-wazn</em>) acts as a standardized template determining exact grammatical function. The <strong>Key Morphological Analysis</strong> applies this dual framework systematically across the text. By isolating recurring roots and their derived forms, it uncovers semantic clusters across disparate verses or sentences, serving as the foundational mechanism by which the app generates its thematic overview.</p>
+                <p><strong>Note:</strong> In Arabic grammar, a triliteral root (<em>al-jathr</em>) carries the
+                    fundamental, broad meaning of a word family, while the pattern weight (<em>al-wazn</em>) acts as a
+                    standardized template determining exact grammatical function. The <strong>Key Morphological
+                        Analysis</strong> applies this dual framework systematically across the text. By isolating
+                    recurring roots and their derived forms, it uncovers semantic clusters across disparate verses or
+                    sentences, serving as the foundational mechanism by which the app generates its thematic overview.
+                </p>
 
                 <p>Powered by Gemini 3.1 and the QuranExplorer linguistic framework. Audio from the Quran API project
                     (https://quranapi.pages.dev/)</p>
@@ -321,14 +327,17 @@
                 <p id="about-subscription-status"
                     style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 1rem; margin-bottom: -0.4rem; font-weight: 500;">
                 </p>
-                <div class="about-links" style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; font-size: 0.8rem;">
-                    <a href="privacy.html" id="about-privacy-link" style="color: var(--gold); text-decoration: underline;">Privacy Policy</a>
+                <div class="about-links"
+                    style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; font-size: 0.8rem;">
+                    <a href="privacy.html" id="about-privacy-link"
+                        style="color: var(--gold); text-decoration: underline;">Privacy Policy</a>
                     <span style="color: var(--text-muted);">|</span>
-                    <a href="terms.html" id="about-terms-link" style="color: var(--gold); text-decoration: underline;">Terms of Use</a>
+                    <a href="terms.html" id="about-terms-link"
+                        style="color: var(--gold); text-decoration: underline;">Terms of Use</a>
                 </div>
                 <p id="about-version-label"
                     style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.8rem; margin-bottom: 0;">
-                    Version 1.6.2</p>
+                    Version 1.6.5</p>
             </div>
         </div>
     </div>
@@ -419,11 +428,13 @@
                     <div style="display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; width: 100%;">
                         <a href="https://apps.apple.com/app/id6795434967" target="_blank" class="store-badge-link"
                             aria-label="Download on the App Store">
-                            <img src="img/appstore.png" alt="Download on the App Store" style="height: 40px; border-radius: 6px;">
+                            <img src="img/appstore.png" alt="Download on the App Store"
+                                style="height: 40px; border-radius: 6px;">
                         </a>
                         <a href="https://play.google.com/store/apps/details?id=com.mpv.quran_potd" target="_blank"
                             class="store-badge-link" aria-label="Get it on Google Play">
-                            <img src="img/playstore.png" alt="Get it on Google Play" style="height: 40px; border-radius: 6px;">
+                            <img src="img/playstore.png" alt="Get it on Google Play"
+                                style="height: 40px; border-radius: 6px;">
                         </a>
                     </div>
                 </div>
@@ -490,7 +501,7 @@
                 style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.6rem;">
                 <i class="fa-solid fa-share-nodes" style="color: var(--gold); font-size: 1.2rem;"></i>
                 <h4 id="share-modal-title"
-                    style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.1rem;">Share Passage</h4>
+                    style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.1rem; border-bottom: none; padding-bottom: 0;">Share Passage</h4>
             </div>
 
             <div class="modal-body share-modal-body">
@@ -515,31 +526,67 @@
         </div>
     </div>
 
+    <!-- Glassmorphic Concordance Modal -->
+    <div id="concordance-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-card concordance-modal-card" style="max-width: 500px; width: 90%; max-height: 90vh;">
+            <span id="concordance-close-btn" class="close-btn">&times;</span>
+            <div class="concordance-modal-header" style="margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.6rem;">
+                <h4 style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: none; padding-bottom: 0;">
+                    <i class="fa-solid fa-book" style="color: var(--gold); font-size: 1.2rem;"></i>
+                    <span id="concordance-modal-title">Root Occurrences</span>
+                </h4>
+            </div>
+
+            <div class="modal-body concordance-modal-body" style="max-height: 75vh; overflow-y: auto; padding-right: 0.4rem;">
+                <div id="concordance-word-info" class="hidden" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 1rem; font-size: 0.85rem;"></div>
+                <div id="concordance-loading" class="hidden" style="text-align: center; padding: 2rem;">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p id="concordance-loading-text" style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Fetching concordance...</p>
+                </div>
+                <div id="concordance-error" class="hidden" style="text-align: center; padding: 2rem; color: #f43f5e;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <p id="concordance-error-msg" style="font-size: 0.85rem; margin: 0;"></p>
+                </div>
+                <div id="concordance-results-list" class="bookmarks-list">
+                    <!-- Concordance instances populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Glassmorphic Update Modal -->
     <div id="update-modal" class="modal-overlay hidden">
         <div class="modal-content glass-card update-modal-card" style="max-width: 380px; width: 90%;">
             <span id="update-close-btn" class="close-btn hidden">&times;</span>
             <div class="update-header" style="text-align: center; margin-bottom: 1rem;">
-                <div class="update-icon-container" style="background: var(--gold-light); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(212,175,55,0.15);">
+                <div class="update-icon-container"
+                    style="background: var(--gold-light); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(212,175,55,0.15);">
                     <i class="fa-solid fa-cloud-arrow-down"></i>
                 </div>
-                <h4 id="update-title-label" style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.25rem;">Update Available</h4>
+                <h4 id="update-title-label"
+                    style="margin: 0; color: var(--text-main); font-weight: 700; font-size: 1.25rem;">Update Available
+                </h4>
             </div>
 
             <div class="modal-body update-body" style="text-align: center; margin-bottom: 1.5rem;">
-                <p id="update-description-label" style="font-size: 0.9rem; color: var(--text-main); line-height: 1.45rem; margin: 0 0 1rem 0;">
-                    A new version of the app is available. Please update to ensure you have the latest features and security improvements.
+                <p id="update-description-label"
+                    style="font-size: 0.9rem; color: var(--text-main); line-height: 1.45rem; margin: 0 0 1rem 0;">
+                    A new version of the app is available. Please update to ensure you have the latest features and
+                    security improvements.
                 </p>
-                <p id="update-version-info" style="font-size: 0.75rem; color: var(--text-muted); margin: 0; font-weight: 500;">
+                <p id="update-version-info"
+                    style="font-size: 0.75rem; color: var(--text-muted); margin: 0; font-weight: 500;">
                     Version: <span id="update-version-latest">1.6.2</span>
                 </p>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 0.7rem; width: 100%;">
-                <button id="update-now-btn" class="paywall-primary-btn" style="background: var(--gold) !important; color: var(--bg-main) !important; font-weight: 700; border: none; padding: 0.85rem; border-radius: 8px; cursor: pointer; text-align: center; width: 100%;">
+                <button id="update-now-btn" class="paywall-primary-btn"
+                    style="background: var(--gold) !important; color: var(--bg-main) !important; font-weight: 700; border: none; padding: 0.85rem; border-radius: 8px; cursor: pointer; text-align: center; width: 100%;">
                     Update Now
                 </button>
-                <button id="update-later-btn" class="paywall-secondary-btn" style="border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: var(--text-main); padding: 0.85rem; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;">
+                <button id="update-later-btn" class="paywall-secondary-btn"
+                    style="border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: var(--text-main); padding: 0.85rem; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;">
                     Later
                 </button>
             </div>
@@ -549,7 +596,7 @@
     <!-- Toast Notification Popup -->
     <div id="copy-toast" class="toast hidden">✅ Passage copied to clipboard!</div>
 
-    <script type="module" src="app.js?v=1.6.2"></script>
+    <script type="module" src="app.js?v=1.6.11"></script>
 </body>
 
 </html>
